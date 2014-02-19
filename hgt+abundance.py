@@ -131,7 +131,7 @@ class Population:
         self.microbiome_sum=numpy.array([])
         for individual in self.composition_of_individual:
             self.microbiome_sum=addition_of_arrays(1,1,self.microbiome_sum,individual.microbiome)
-        self.microbiome_sum=self.microbiome_sum/float(sum(self.microbiome_sum)) #composition of the microbiomes within the population in terms of genome
+        self.microbiome_sum=self.microbiome_sum/float(self.number_of_individual*self.number_of_individual_species) #composition of the microbiomes within the population in terms of genome
         self.species_community=self.species_registry.get_species_community(self.microbiome_sum) #composition of the microbiomes within the population in terms of species marker
 
     def measure_biodiversity(self): #overall diversity gamma-diversity
@@ -168,10 +168,10 @@ class Population:
                 x=len(self.species_registry.species_list)-len(self.composition_of_individual[i].microbiome) #keep host microbiome list of the same length as species registry
                 if x>0:
                     self.composition_of_individual[i].microbiome=numpy.array(self.composition_of_individual[i].microbiome.tolist()+[0]*x)
-                gene_pool=self.species_registry.get_gene_pool(self.composition_of_individual[i].microbiome) #gene pool for hgt
+                self.composition_of_individual[i].gene_pool=self.species_registry.get_gene_pool(self.composition_of_individual[i].microbiome) #gene pool for hgt
                 gene_total=0
                 cummulative_gene_pool=[]
-                for gene in gene_pool:
+                for gene in self.composition_of_individual[i].gene_pool:
                     gene_total+=gene
                     cummulative_gene_pool.append(gene_total) # prepare for binary search weighted choice
                 species_for_hgt=numpy.random.multinomial(hgt_events,self.composition_of_individual[i].microbiome/float(self.number_of_individual_species))
@@ -188,6 +188,8 @@ class Population:
                                     if old_genotype|removed_gene==old_genotype: #randomly remove one gene from the genotype
                                         break
                                 new_genotype=(old_genotype^removed_gene)|new_gene
+                                self.composition_of_individual[i].gene_pool[int(math.log(removed_gene)/math.log(2))]-=1
+                                self.composition_of_individual[i].gene_pool[int(math.log(new_gene)/math.log(2))]+=1
                                 new_species=[species_marker,new_genotype]
                                 new_species_index=self.species_registry.find_species(new_species)
                                 self.composition_of_individual[i].microbiome[species_index]=self.composition_of_individual[i].microbiome[species_index]-1 # old species decrease by 1
@@ -199,7 +201,6 @@ class Population:
                                     break
                             j=j-1
                     species_index+=1
-            self.composition_of_individual[i].gene_pool=self.species_registry.get_gene_pool(self.composition_of_individual[i].microbiome)
             new_fitness=sum(numpy.array(self.gene_fitness)*self.composition_of_individual[i].gene_pool)/float(self.number_of_individual_species)
             self.fitness_collection.append(new_fitness)
             self.composition_of_individual[i].weighted_fitness=2**new_fitness
@@ -311,7 +312,7 @@ def run(species_registry,env,env_factor,pooled_or_fixed,hgt_rate,gene_fitness,re
     file4=open(str(rep)+"_sum_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
     file5=open(str(rep)+"_fitness_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
     file6=open(str(rep)+"_alpha_diversity_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
-    while population.number_of_generation<=100:
+    while population.number_of_generation<=10000:
         population.sum_species()
         print >>file1, population.ratio_of_fixation()
         print >>file2, population.measure_biodiversity()
