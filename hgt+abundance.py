@@ -68,6 +68,7 @@ class SpeciesRegistry:  # for recording the genotype of different species
                 gene += 1
             self.fitness_list = self.fitness_list + [2 ** species_fitness]  # add it to fitness list
             return new_index
+<<<<<<< HEAD
 
     def get_gene_pool(self, microbiome):  # get a gene pool from a microbiome
         gene_pool = numpy.array([0 for k in range(self.number_of_total_genes)])
@@ -99,6 +100,27 @@ class SpeciesRegistry:  # for recording the genotype of different species
         species_community = microbiome[:self.initial_number_of_species]
         for i in range(self.initial_number_of_species, len(microbiome)):
             species_community[self.species_list[i][0]] += microbiome[i]
+=======
+           
+    def get_gene_pool(self,microbiome): #get a gene pool from a microbiome
+        gene_pool=[0 for k in range(self.number_of_total_genes)] 
+        for i in range(len(microbiome)):
+            if microbiome[i]<=0:
+                continue
+            binary_number=self.species_list[i][1]
+            id=0
+            while binary_number:
+                if binary_number&1:
+                    gene_pool[id]+=microbiome[i]
+                binary_number=binary_number>>1
+                id+=1
+        return numpy.array(gene_pool)
+        
+    def get_species_community(self,microbiome): # represent the composition of one microbiome through species_marker regardless of the genotype
+        species_community=microbiome[:self.initial_number_of_species]
+        for i in range(self.initial_number_of_species,len(microbiome)):
+            species_community[self.species_list[i][0]]+=microbiome[i]
+>>>>>>> edit get gene pool using binary number
         return species_community
 
     def get_fitness_selection(self, microbiome):  # this function is used when species acquisition is totally determined by bacterial fitness
@@ -321,6 +343,7 @@ class Population:
     def __str__(self):
         return '\t'.join([str(k) for k in self.species_community])
 
+<<<<<<< HEAD
 def run(species_registry, env, env_factor, pooled_or_fixed, hgt_rate, gene_fitness, rep):
     population = Population(species_registry, env, 500, 1000, gene_fitness, hgt_rate, env_factor, pooled_or_fixed)
     file1 = open(str(rep) + "_fixation_" + str(y) + "_" + str(x) + "_" + str(hgt_rate) + ".txt", 'w')
@@ -330,6 +353,17 @@ def run(species_registry, env, env_factor, pooled_or_fixed, hgt_rate, gene_fitne
     file5 = open(str(rep) + "_fitness_" + str(y) + "_" + str(x) + "_" + str(hgt_rate) + ".txt", 'w')
     file6 = open(str(rep) + "_alpha_diversity_" + str(y) + "_" + str(x) + "_" + str(hgt_rate) + ".txt", 'w')
     while population.number_of_generation <= 10000:
+=======
+def run(species_registry,env,env_factor,pooled_or_fixed,hgt_rate,gene_fitness,rep):
+    population=Population(species_registry,env,500,1000,gene_fitness,hgt_rate,env_factor,pooled_or_fixed)
+    file1=open(str(rep)+"_fixation_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
+    file2=open(str(rep)+"_biodiversity_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
+    file3=open(str(rep)+"_statistics_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
+    file4=open(str(rep)+"_sum_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
+    file5=open(str(rep)+"_fitness_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
+    file6=open(str(rep)+"_alpha_diversity_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
+    while population.number_of_generation<=100:
+>>>>>>> edit get gene pool using binary number
         population.sum_species()
         print >> file1, population.ratio_of_fixation()
         print >> file2, population.measure_biodiversity()
