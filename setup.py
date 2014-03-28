@@ -20,6 +20,7 @@ setup(
     keywords = "",
     url = "",
     packages=['microbiosima',],
+    package_dir={'microbiosima': 'microbiosima'},
     test_suite = "microbiosima.test",
     long_description=read('README.txt'),
     classifiers=[
