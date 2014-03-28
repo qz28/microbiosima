@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import unittest
-from microbiosima import different_element
+from microbiosima.microbiosima import different_element
 
 class TestDE(unittest.TestCase):
     def test(self):

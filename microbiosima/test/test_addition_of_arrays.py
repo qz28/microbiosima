@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 import numpy
-from microbiosima import addition_of_arrays
+from microbiosima.microbiosima import addition_of_arrays
 
 class TestAA(unittest.TestCase):
     def test(self):
