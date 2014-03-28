@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import unittest
-from hgt_abundance 1 import different_element
+from microbiosima import different_element
 
 class TestDE(unittest.TestCase):
     def test(self):
