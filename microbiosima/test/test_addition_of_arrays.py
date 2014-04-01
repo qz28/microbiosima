@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 import unittest
 import numpy
-from microbiosima.microbiosima import addition_of_arrays
+from microbiosima.microbiosima import weighted_choice_b
 
 class TestAA(unittest.TestCase):
     def test(self):
-        numpy.array_equal(addition_of_arrays(1,1,numpy.array([1,2,3]),numpy.array([1,2,3,4])),numpy.array([2,4,6,4]))
-        numpy.array_equal(addition_of_arrays(1,1,numpy.array([1,1,1]),numpy.array([0,1])),numpy.array([1,2,1]))
-        numpy.array_equal(addition_of_arrays(1,1,numpy.array([1,2,3]),numpy.array([1,1,1])),numpy.array([2,3,4]))
+        count=[0,0,0]
+        for i in range(1000):
+            count[weighted_choice_b([0.5,0.7,1.0])]+=1
+        assert count[0]>450&&count[0]<550
+        assert count[1]>180&&count[1]<220
+        assert count[2]>270&&count[2]<330
 
 if __name__=='__main__':
     unittest.main()
