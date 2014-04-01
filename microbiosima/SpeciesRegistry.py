@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import random
 import numpy
-    
+
+#test  
 class SpeciesRegistry: #for recording the genotype of different species
     def __init__(self,initial_number_of_species,number_of_genes,number_of_total_genes,fitness_to_bacterial):
         self.species_list=[] #a species list within which there are different species represented by one marker gene and one genotype list
