@@ -20,7 +20,7 @@ class SpeciesRegistry: #for recording the genotype of different species
             for gene in gene_list:
                 species_fitness+=fitness_to_bacterial[gene]
                 species_genotype+=self.gene_binary_index[gene]
-            self.fitness_list.append(2**species_fitness)
+            self.fitness_list.append(1**species_fitness)
             species.append(species_genotype)
             self.species_list.append(species)
         
@@ -36,7 +36,7 @@ class SpeciesRegistry: #for recording the genotype of different species
                 if species[1]|index==species[1]:
                     species_fitness+=self.fitness_to_bacterial[gene] # get the new bacterial fitness
                 gene+=1
-            self.fitness_list=self.fitness_list+[2**species_fitness] # add it to fitness list
+            self.fitness_list=self.fitness_list+[1**species_fitness] # add it to fitness list
             return new_index
            
     def get_gene_pool(self,microbiome): #get a gene pool from a microbiome (untested)
@@ -53,20 +53,4 @@ class SpeciesRegistry: #for recording the genotype of different species
         for i in range(self.initial_number_of_species,len(microbiome)):
             species_community[self.species_list[i][0]]+=microbiome[i]
         return species_community
-        
-    def get_fitness_selection(self,microbiome):    # this function is used when species acquisition is totally determined by bacterial fitness (The length of microbiome need to be considered)
-        length=len(microbiome)
-        fitness_selection=self.fitness_list[:length]
-        if 0 not in microbiome:
-            return [fitness/float(sum(fitness_selection)) for fitness in fitness_selection]
-        else:
-            index=0
-            for abundance in microbiome:
-                if abundance==0:
-                    fitness_selection[index]=0
-                index+=1
-            return [fitness/float(sum(fitness_selection)) for fitness in fitness_selection]
             
-
-##for rep in range(1):
-    ##run(species_registry,environment,env_factor,pooled_or_fixed,hgt_rate,gene_fitness,rep)

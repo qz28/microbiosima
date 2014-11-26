@@ -5,7 +5,7 @@ import copy
 import numpy
 import bisect
 
-input_number=100
+script,input_number=argv
 y=int(input_number)%11
 x=int(input_number)/11
 
@@ -31,7 +31,7 @@ def addition_of_arrays(x,y,a,b): #for addition of two numpy.arrays which may hav
             a=numpy.array(a.tolist()+[0]*(-d))
         c=a*x+b*y
     return c
-    
+
 class SpeciesRegistry: #for recording the genotype of different species
     def __init__(self,initial_number_of_species,number_of_genes,number_of_total_genes,fitness_to_bacterial):
         self.species_list=[] #a species list within which there are different species represented by one marker gene and one genotype list
@@ -49,7 +49,7 @@ class SpeciesRegistry: #for recording the genotype of different species
             for gene in gene_list:
                 species_fitness+=fitness_to_bacterial[gene]
                 species_genotype+=self.gene_binary_index[gene]
-            self.fitness_list.append(2**species_fitness)
+            self.fitness_list.append(1**species_fitness)
             species.append(species_genotype)
             self.species_list.append(species)
         
@@ -65,7 +65,7 @@ class SpeciesRegistry: #for recording the genotype of different species
                 if species[1]|index==species[1]:
                     species_fitness+=self.fitness_to_bacterial[gene] # get the new bacterial fitness
                 gene+=1
-            self.fitness_list=self.fitness_list+[2**species_fitness] # add it to fitness list
+            self.fitness_list=self.fitness_list+[1**species_fitness] # add it to fitness list
             return new_index
            
     def get_gene_pool(self,microbiome): #get a gene pool from a microbiome (untested)
@@ -82,21 +82,7 @@ class SpeciesRegistry: #for recording the genotype of different species
         for i in range(self.initial_number_of_species,len(microbiome)):
             species_community[self.species_list[i][0]]+=microbiome[i]
         return species_community
-        
-    def get_fitness_selection(self,microbiome):    # this function is used when species acquisition is totally determined by bacterial fitness (The length of microbiome need to be considered)
-        length=len(microbiome)
-        fitness_selection=self.fitness_list[:length]
-        if 0 not in microbiome:
-            return [fitness/float(sum(fitness_selection)) for fitness in fitness_selection]
-        else:
-            index=0
-            for abundance in microbiome:
-                if abundance==0:
-                    fitness_selection[index]=0
-                index+=1
-            return [fitness/float(sum(fitness_selection)) for fitness in fitness_selection]
             
-
 class Individual:
     def __init__(self,environment,number_of_individual_species,species_registry,gene_fitness): # the host
         self.number_of_environmental_species=len(environment)
@@ -105,7 +91,7 @@ class Individual:
         self.gene_pool=species_registry.get_gene_pool(self.microbiome)
         self.species_registry=species_registry
         self.fitness=sum(numpy.array(gene_fitness)*self.gene_pool)/float(number_of_individual_species) # fitness contributing to the host
-        self.weighted_fitness=2**(self.fitness)
+        self.weighted_fitness=1**(self.fitness)
         
     def __str__(self):
         self.microbiome_sequence=['0']*self.number_of_environmental_species
@@ -115,18 +101,16 @@ class Individual:
         return ''.join(self.microbiome_sequence)
 
 class Population:
-    def __init__(self,species_registry,environment,number_of_individual,number_of_individual_species,gene_fitness,hgt_rate,environmental_factor,pooled_or_fixed):
+    def __init__(self,species_registry,environment,number_of_individual,number_of_individual_species,gene_fitness,environmental_factor,pooled_or_fixed):
         self.number_of_individual_species=number_of_individual_species #number of microbes in each host
         self.number_of_environmental_species=len(environment)
         self.number_of_individual=number_of_individual # number of host in the population
         self.number_of_generation=0
-        self.hgt_rate=hgt_rate
         self.environmental_factor=environmental_factor #percentage of environmental acquisition
         self.pooled_or_fixed=pooled_or_fixed #percentage of pooled environmental component
         self.environment=numpy.array(environment) 
         self.gene_fitness=gene_fitness #fitness of each gene contributing to host
         self.species_registry=species_registry
-        self.random_binary_index=[2**k for k in range(species_registry.number_of_total_genes)] 
         self.composition_of_individual=[Individual(environment,number_of_individual_species,species_registry,gene_fitness) for k in range(number_of_individual)] 
         self.fitness_collection=[individual.fitness for individual in self.composition_of_individual] #record the host fitness of each generation
         
@@ -157,60 +141,14 @@ class Population:
         environmental_contribution=addition_of_arrays(self.pooled_or_fixed,1-self.pooled_or_fixed,self.microbiome_sum,self.environment) #mix pooled and fixed env
         for i in range(self.number_of_individual): #mix environmental and parental contribution
             mixed_contribution=addition_of_arrays(1-self.environmental_factor,self.environmental_factor,parental_contribution[i],environmental_contribution)
-            self.composition_of_individual[i].microbiome=numpy.random.multinomial(self.number_of_individual_species,self.species_registry.get_fitness_selection(mixed_contribution))
-            if self.hgt_rate==0: # when no hgt occurs
-                self.composition_of_individual[i].gene_pool=self.species_registry.get_gene_pool(self.composition_of_individual[i].microbiome)
-                new_fitness=sum(numpy.array(self.gene_fitness)*self.composition_of_individual[i].gene_pool)/float(self.number_of_individual_species)
-                self.fitness_collection.append(new_fitness)
-                self.composition_of_individual[i].weighted_fitness=2**new_fitness
-                
-    def get_from_gene_pool(self):
-        for i in range(self.number_of_individual):
-            hgt_events=numpy.random.poisson(self.hgt_rate) #determine how many hgt events happen for each host
-            if hgt_events>0:
-                x=len(self.species_registry.species_list)-len(self.composition_of_individual[i].microbiome) #keep host microbiome list of the same length as species registry
-                if x>0:
-                    self.composition_of_individual[i].microbiome=numpy.array(self.composition_of_individual[i].microbiome.tolist()+[0]*x)
-                gene_pool=self.species_registry.get_gene_pool(self.composition_of_individual[i].microbiome) #gene pool for hgt
-                gene_total=0
-                cummulative_gene_pool=[]
-                for gene in gene_pool:
-                    gene_total+=gene
-                    cummulative_gene_pool.append(gene_total) # prepare for binary search weighted choice
-                species_for_hgt=numpy.random.multinomial(hgt_events,self.composition_of_individual[i].microbiome/float(self.number_of_individual_species))
-                species_index=0
-                for j in species_for_hgt: # j means how many hgt happens for each species
-                    if j>0:
-                        old_genotype=self.species_registry.species_list[species_index][1]
-                        species_marker=self.species_registry.species_list[species_index][0]
-                        while j>0:
-                            new_gene=2**(weighted_choice_b(cummulative_gene_pool))
-                            if old_genotype|new_gene!=old_genotype:
-                                random.shuffle(self.random_binary_index)
-                                for removed_gene in self.random_binary_index:
-                                    if old_genotype|removed_gene==old_genotype: #randomly remove one gene from the genotype
-                                        break
-                                new_genotype=(old_genotype^removed_gene)|new_gene
-                                new_species=[species_marker,new_genotype]
-                                new_species_index=self.species_registry.find_species(new_species)
-                                self.composition_of_individual[i].microbiome[species_index]=self.composition_of_individual[i].microbiome[species_index]-1 # old species decrease by 1
-                                try:
-                                    self.composition_of_individual[i].microbiome[new_species_index]=self.composition_of_individual[i].microbiome[new_species_index]+1 # new species increase by 1
-                                except IndexError:
-                                    self.composition_of_individual[i].microbiome=numpy.array(self.composition_of_individual[i].microbiome.tolist()+[1])
-                                if self.composition_of_individual[i].microbiome[species_index]==0: #prevent the number of microbes becoming negative
-                                    break
-                            j=j-1
-                    species_index+=1
+            self.composition_of_individual[i].microbiome=numpy.random.multinomial(self.number_of_individual_species,mixed_contribution/sum(mixed_contribution))
             self.composition_of_individual[i].gene_pool=self.species_registry.get_gene_pool(self.composition_of_individual[i].microbiome)
             new_fitness=sum(numpy.array(self.gene_fitness)*self.composition_of_individual[i].gene_pool)/float(self.number_of_individual_species)
             self.fitness_collection.append(new_fitness)
-            self.composition_of_individual[i].weighted_fitness=2**new_fitness
+            self.composition_of_individual[i].weighted_fitness=1**new_fitness#no selection
             
     def get_next_gen(self):
         self.get_from_parent_and_environment()
-        if self.hgt_rate>0:
-            self.get_from_gene_pool()
         self.pre_species_community=self.species_community
         self.number_of_generation+=1
         
@@ -264,7 +202,7 @@ class Population:
                     fre_i=self.alignment.count(sequence_set[i])/float(self.number_of_individual)
                     fre_j=self.alignment.count(sequence_set[j])/float(self.number_of_individual)
                     self.pi+=fre_i*fre_j*different_element(sequence_set[i],sequence_set[j])/self.number_of_environmental_species
-            self.pi=self.pi*self.number_of_individual/(self.number_of_individual-1)
+            self.pi=self.pi*self.number_of_individual/(self.number_of_individual-1)*2
             return self.pi
         else:
             return self.pi
@@ -306,15 +244,15 @@ class Population:
     def __str__(self):
         return '\t'.join([str(k) for k in self.species_community])
 
-def run(species_registry,env,env_factor,pooled_or_fixed,hgt_rate,gene_fitness,rep):
-    population=Population(species_registry,env,500,1000,gene_fitness,hgt_rate,env_factor,pooled_or_fixed)
+def run(species_registry,env,env_factor,pooled_or_fixed,gene_fitness,rep):
+    population=Population(species_registry,env,500,1000,gene_fitness,env_factor,pooled_or_fixed)
     file1=open(str(rep)+"_fixation_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
     file2=open(str(rep)+"_biodiversity_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
     file3=open(str(rep)+"_statistics_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
     file4=open(str(rep)+"_sum_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
     file5=open(str(rep)+"_fitness_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
     file6=open(str(rep)+"_alpha_diversity_"+str(y)+"_"+str(x)+"_"+str(hgt_rate)+".txt",'w')
-    while population.number_of_generation<=0:
+    while population.number_of_generation<=10000:
         population.sum_species()
         print >>file1, population.ratio_of_fixation()
         print >>file2, population.measure_biodiversity()
@@ -329,11 +267,11 @@ def run(species_registry,env,env_factor,pooled_or_fixed,hgt_rate,gene_fitness,re
 
 num_species=150
 environment=[1/float(num_species) for i in range(num_species)]
-fitness_to_bacterial=[-1,-1,-1,-1,-1,1,1,1,1,1]
+fitness_to_bacterial=[0,0,0,0,0,0,0,0,0,0]
 species_registry=SpeciesRegistry(num_species,5,10,fitness_to_bacterial)
-gene_fitness=[1,1,1,1,1,-1,-1,-1,-1,-1]
-pooled_or_fixed=0.1*y
+gene_fitness=[0,0,0,0,0,0,0,0,0,0]
+pooled_or_fixed=1-0.5**y
 hgt_rate=0
 env_factor=0.5**x
-##for rep in range(1):
-    ##run(species_registry,environment,env_factor,pooled_or_fixed,hgt_rate,gene_fitness,rep)
+for rep in range(10):
+    run(species_registry,environment,env_factor,pooled_or_fixed,hgt_rate,gene_fitness,rep)
