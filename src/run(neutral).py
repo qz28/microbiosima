@@ -20,7 +20,7 @@ except ValueError:
     population_size=500
     microbe_size=1000
     num_species=150
-    number_of_generation=10
+    number_of_generation=10000
     number_generation_for_observation=10
     replication=1
     
@@ -51,6 +51,6 @@ def run(species_registry,env,env_factor,pooled_or_fixed,rep):
 environment=[1/float(num_species) for i in range(num_species)]
 species_registry=SpeciesRegistry(num_species)
 pooled_or_fixed=y
-env_factor=1-x
+env_factor=x
 for rep in range(replication):
     run(species_registry,environment,env_factor,pooled_or_fixed,rep)
