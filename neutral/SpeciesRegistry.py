@@ -3,7 +3,17 @@ import random
 import numpy
 
 #test  
-class SpeciesRegistry: #for recording the genotype of different species
+class SpeciesRegistry (object): #for recording the genotype of different species
+    def __init__(self,initial_number_of_species):
+        self.species_list=[] #a species list within which there are different species represented by one marker gene and one genotype list
+        self.initial_number_of_species=initial_number_of_species
+        for species_marker in range(initial_number_of_species):
+            self.species_list.append(species_marker)
+            
+    def get_species_community(self,microbiome): # represent the composition of one microbiome through species_marker regardless of the genotype
+        return microbiome
+        
+class Selective_SpeciesRegistry (SpeciesRegistry): #for recording the genotype of different species
     def __init__(self,initial_number_of_species,number_of_genes,number_of_total_genes,fitness_to_bacterial):
         self.species_list=[] #a species list within which there are different species represented by one marker gene and one genotype list
         self.initial_number_of_species=initial_number_of_species
@@ -23,6 +33,28 @@ class SpeciesRegistry: #for recording the genotype of different species
             self.fitness_list.append(1**species_fitness)
             species.append(species_genotype)
             self.species_list.append(species)
+
+    def get_gene_pool(self,microbiome): #get a gene pool from a microbiome (untested)
+        gene_pool=numpy.array([0 for k in range(self.number_of_total_genes)]) 
+        for i in range(len(microbiome)):
+            if microbiome[i]>0:
+                supplement=self.number_of_total_genes+2-len(bin(self.species_list[i][1]))
+                gene_binary_number='0'*supplement+bin(self.species_list[i][1])[2:]
+                gene_pool+=numpy.array([int(k) for k in gene_binary_number])*microbiome[i]
+        return gene_pool[::-1]
+        
+    def get_fitness_selection(self,microbiome): # this function is used when species acquisition is totally determined by bacterial fitness
+        fitness_selection=[]
+        index=0
+        for abundance in microbiome:
+            fitness_selection.append(abundance*self.fitness_list[index])
+            index+=1
+        Total_fitness=float(sum(fitness_selection))
+        return [fitness/Total_fitness for fitness in fitness_selection]
+        
+class HGT_SpeciesRegistry (Selective_SpeciesRegistry): #for recording the genotype of different species
+    def __init__(self,initial_number_of_species,number_of_genes,number_of_total_genes,fitness_to_bacterial):
+        super(HGT_SpeciesRegistry, self).__init__(initial_number_of_species,number_of_genes,number_of_total_genes,fitness_to_bacterial)
         
     def find_species(self,species): # when one species is created by hgt, this function return the species index
         if species in self.species_list:
@@ -38,19 +70,11 @@ class SpeciesRegistry: #for recording the genotype of different species
                 gene+=1
             self.fitness_list=self.fitness_list+[1**species_fitness] # add it to fitness list
             return new_index
-           
-    def get_gene_pool(self,microbiome): #get a gene pool from a microbiome (untested)
-        gene_pool=numpy.array([0 for k in range(self.number_of_total_genes)]) 
-        for i in range(len(microbiome)):
-            if microbiome[i]>0:
-                supplement=self.number_of_total_genes+2-len(bin(self.species_list[i][1]))
-                gene_binary_number='0'*supplement+bin(self.species_list[i][1])[2:]
-                gene_pool+=numpy.array([int(k) for k in gene_binary_number])*microbiome[i]
-        return gene_pool[::-1]
         
     def get_species_community(self,microbiome): # represent the composition of one microbiome through species_marker regardless of the genotype
         species_community=microbiome[:self.initial_number_of_species]
         for i in range(self.initial_number_of_species,len(microbiome)):
             species_community[self.species_list[i][0]]+=microbiome[i]
         return species_community
-            
+        
+
