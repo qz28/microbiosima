@@ -5,13 +5,12 @@ import random
 import numpy
 
 from Individual import Individual, Selective_Individual
-from other_functions import addition_of_arrays
-from other_functions import different_element
-from other_functions import weighted_choice_b
+from other_functions import addition_of_arrays, different_element, weighted_choice_b
 
 
 class Population(object):
-    def __init__(self, species_registry, environment, number_of_individual, number_of_individual_species, environmental_factor, pooled_or_fixed):
+    def __init__(self, species_registry, environment, number_of_individual,
+                 number_of_individual_species, environmental_factor, pooled_or_fixed):
         self.number_of_microbes_in_host = number_of_individual_species  # number of microbes in each host
         self.number_of_environmental_species = len(environment)
         self.number_of_host_in_population = number_of_individual  # number of host in the population
@@ -109,11 +108,16 @@ class Population(object):
         number_sequence = len(sequence_set)
         if number_sequence > 1:
             for i in range(1, number_sequence):
+                fre_i = self.alignment.count(sequence_set[i]) / float(self.number_of_host_in_population)
                 for j in range(i):
-                    fre_i = self.alignment.count(sequence_set[i]) / float(self.number_of_host_in_population)
                     fre_j = self.alignment.count(sequence_set[j]) / float(self.number_of_host_in_population)
                     self.beta_diversity += fre_i * fre_j * different_element(
                         sequence_set[i], sequence_set[j]) / self.number_of_environmental_species
+                    # NOTE: Can factor out fre_i, it's faster but less clear
+#                     temp_div += fre_j * different_element(
+#                         sequence_set[i], sequence_set[j]) / self.number_of_environmental_species
+#                 self.beta_diversity += (fre_i * temp_div)
+
 #             self.beta_diversity = self.beta_diversity * self.number_of_host_in_population / (self.number_of_host_in_population - 1) * 2
             self.beta_diversity *= (self.number_of_host_in_population /
                                     (self.number_of_host_in_population - 1) * 2)
@@ -199,7 +203,8 @@ class Selective_Population(Population):
             self.composition_of_individual[i].microbiome = numpy.random.multinomial(
                 self.number_of_microbes_in_host, mixed_contribution / sum(mixed_contribution))
             self.composition_of_individual[i].gene_pool = self.species_registry.get_gene_pool(self.composition_of_individual[i].microbiome)
-            new_fitness = sum(numpy.array(self.gene_fitness) * self.composition_of_individual[i].gene_pool) / float(self.number_of_microbes_in_host)
+            new_fitness = sum(numpy.array(self.gene_fitness) *
+                              self.composition_of_individual[i].gene_pool) / float(self.number_of_microbes_in_host)
             self.fitness_collection.append(new_fitness)
             self.composition_of_individual[i].weighted_fitness = 1 ** new_fitness  # no selection
 
@@ -251,8 +256,8 @@ class HGT_Population(Selective_Population):
 #                                 self.composition_of_individual[i].microbiome[species_index] = self.composition_of_individual[i].microbiome[species_index] - 1  # old species decrease by 1
                                 self.composition_of_individual[i].microbiome[species_index] -= 1
                                 try:
-#                                     self.composition_of_individual[i].microbiome[new_species_index] = self.composition_of_individual[i].microbiome[new_species_index] + 1  # new species increase by 1
                                     self.composition_of_individual[i].microbiome[new_species_index] += 1  # new species increase by 1
+#                                     self.composition_of_individual[i].microbiome[new_species_index] = self.composition_of_individual[i].microbiome[new_species_index] + 1  # new species increase by 1
                                 except IndexError:
                                     self.composition_of_individual[i].microbiome = numpy.array(
                                         self.composition_of_individual[i].microbiome.tolist() + [1])
