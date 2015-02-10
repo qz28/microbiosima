@@ -25,6 +25,7 @@ class Selective_SpeciesRegistry (SpeciesRegistry):  # for recording the genotype
         self.gene_binary_index = [2 ** k for k in range(number_of_total_genes)]  # binary number representing each gene
         for species_marker in range(initial_number_of_species):
             species = []
+            # NOTE: This can be a class to avoid index error. Or use hash with meanful keys
             species.append(species_marker)
             gene_list = random.sample(range(number_of_total_genes), number_of_genes)
             species_fitness = 0
@@ -37,7 +38,9 @@ class Selective_SpeciesRegistry (SpeciesRegistry):  # for recording the genotype
             self.species_list.append(species)
 
     def get_gene_pool(self, microbiome):  # get a gene pool from a microbiome (untested)
-        gene_pool = numpy.array([0 for k in range(self.number_of_total_genes)])
+        gene_pool = numpy.zeros((self.number_of_total_genes,), dtype=numpy.int)
+#         gene_pool = numpy.array([0 for k in range(self.number_of_total_genes)])
+
         for i in range(len(microbiome)):
             if microbiome[i] > 0:
                 supplement = self.number_of_total_genes + 2 - len(bin(self.species_list[i][1]))
@@ -47,12 +50,12 @@ class Selective_SpeciesRegistry (SpeciesRegistry):  # for recording the genotype
 
     def get_fitness_selection(self, microbiome):  # this function is used when species acquisition is totally determined by bacterial fitness
         fitness_selection = []
-        index = 0
-        for abundance in microbiome:
+#         index = 0
+        for index, abundance in enumerate(microbiome):
             fitness_selection.append(abundance * self.fitness_list[index])
-            index += 1
-        Total_fitness = float(sum(fitness_selection))
-        return [fitness / Total_fitness for fitness in fitness_selection]
+#             index += 1
+        total_fitness = float(sum(fitness_selection))
+        return [fitness / total_fitness for fitness in fitness_selection]
 
 
 class HGT_SpeciesRegistry (Selective_SpeciesRegistry):  # for recording the genotype of different species
@@ -65,12 +68,12 @@ class HGT_SpeciesRegistry (Selective_SpeciesRegistry):  # for recording the geno
         else:  # a new species will be added to species list first and then return the species index
             new_index = len(self.species_list)
             self.species_list.append(species)
-            gene = 0
+#             gene = 0
             species_fitness = 0
-            for index in self.gene_binary_index:
+            for gene, index in enumerate(self.gene_binary_index):
                 if species[1] | index == species[1]:
                     species_fitness += self.fitness_to_bacterial[gene]  # get the new bacterial fitness
-                gene += 1
+#                 gene += 1
             self.fitness_list = self.fitness_list + [1 ** species_fitness]  # add it to fitness list
             return new_index
 

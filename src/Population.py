@@ -26,6 +26,8 @@ class Population(object):
         self.gamma_diversity = 0
         self.number_of_segregating_site = 0
         self.distance = None
+        self.beta_diversity_coef = (self.number_of_host_in_population /
+                                    (self.number_of_host_in_population - 1) * 2)
         # # NOTE: Naming and pre-declare variables, avoid unused variable k
 
     def sum_species(self):
@@ -103,6 +105,7 @@ class Population(object):
 
 
     def beta_diversity(self):
+        # FIXME: you can't call this unless you call microbiome_sequence_alignment() first
         sequence_set = list(set(self.alignment))
         self.beta_diversity = 0
         number_sequence = len(sequence_set)
@@ -119,8 +122,7 @@ class Population(object):
 #                 self.beta_diversity += (fre_i * temp_div)
 
 #             self.beta_diversity = self.beta_diversity * self.number_of_host_in_population / (self.number_of_host_in_population - 1) * 2
-            self.beta_diversity *= (self.number_of_host_in_population /
-                                    (self.number_of_host_in_population - 1) * 2)
+            self.beta_diversity *= self.beta_diversity_coef
 #             return self.beta_diversity
 #         else:
         return self.beta_diversity
@@ -170,10 +172,15 @@ class Population(object):
 
 
 class Selective_Population(Population):
-    def __init__(self, species_registry, environment, number_of_individual, number_of_individual_species, gene_fitness, environmental_factor, pooled_or_fixed):
-        super(Selective_Population, self).__init__(species_registry, environment, number_of_individual, number_of_individual_species, environmental_factor, pooled_or_fixed)
+    def __init__(self, species_registry, environment, number_of_individual,
+                 number_of_individual_species, gene_fitness,
+                 environmental_factor, pooled_or_fixed):
+        super(Selective_Population, self).__init__(
+            species_registry, environment, number_of_individual,
+            number_of_individual_species, environmental_factor, pooled_or_fixed)
         self.gene_fitness = gene_fitness  # fitness of each gene contributing to host
-        self.composition_of_individual = [Selective_Individual(environment, number_of_individual_species, species_registry, gene_fitness) for k in range(number_of_individual)]
+        self.composition_of_individual = [Selective_Individual(
+            environment, number_of_individual_species, species_registry, gene_fitness) for _ in range(number_of_individual)]
         self.fitness_collection = [individual.fitness for individual in self.composition_of_individual]  # record the host fitness of each generation
 
     def get_from_parent_and_environment(self):  # parental inheritance and environmental acquisition

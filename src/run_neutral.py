@@ -33,14 +33,19 @@ if x < 0 or x > 1 or y < 0 or y > 1:
 
 def run(species_registry, env, env_factor, pooled_or_fixed, rep):
     population = Population(species_registry, env, population_size, microbe_size, env_factor, pooled_or_fixed)
-    file1 = open(str(rep + 1) + "_fixation_" + str(y) + "_" + str(x) + "_" + ".txt", 'w')
-    file2 = open(str(rep + 1) + "_gamma_diversity_" + str(y) + "_" + str(x) + "_" + ".txt", 'w')
-    file3 = open(str(rep + 1) + "_beta_diversity_" + str(y) + "_" + str(x) + "_" + ".txt", 'w')
-    file4 = open(str(rep + 1) + "_sum_" + str(y) + "_" + str(x) + "_" + ".txt", 'w')
-    file6 = open(str(rep + 1) + "_alpha_diversity_" + str(y) + "_" + str(x) + "_" + ".txt", 'w')
+    prefix = str(rep + 1)
+    sufix = str(y) + "_" + str(x) + "_" + ".txt"
+    file1 = open(prefix + "_fixation_" + sufix, 'w')
+    file2 = open(prefix + "_gamma_diversity_" + sufix, 'w')
+    file3 = open(prefix + "_beta_diversity_" + sufix, 'w')
+    file4 = open(prefix + "_sum_" + sufix, 'w')
+    file6 = open(prefix + "_alpha_diversity_" + sufix, 'w')
     while population.number_of_generation <= number_of_generation:
         population.sum_species()
         if population.number_of_generation % number_generation_for_observation == 0:
+            # NOTE: separate summarise and get stats
+            # population.calcalute_all_stats()
+            # then use accessor to get values.
             print >> file1, population.ratio_of_fixation()
             print >> file4, population
             print >> file6, population.alpha_diversity()
@@ -57,3 +62,15 @@ pooled_or_fixed = y
 env_factor = x
 for rep in range(replication):
     run(species_registry, environment, env_factor, pooled_or_fixed, rep)
+
+
+
+"""
+parser = argparse.ArgumentParser()
+parser.add_argument("-p", help="population_size")
+parser.add_argument("-m", help="microbe_size")
+parser.add_argument("-g", help="number of generation")
+parser.add_argument("-r", help="replication")
+parser.add_argument("-d", "--debug", action="count", default=0,
+                        help="increase debugging level")
+"""
