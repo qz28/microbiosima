@@ -20,13 +20,14 @@ class Population(object):
         self.percentage_of_pooled_environmental_component = pooled_or_fixed  # percentage of pooled environmental component
         self.environment = numpy.array(environment)
         self.species_registry = species_registry
-        self.composition_of_individual = [Individual(environment, number_of_individual_species, species_registry) for k in range(number_of_individual)]
+        self.composition_of_individual = [Individual(
+            environment, number_of_individual_species, species_registry) for _ in range(number_of_individual)]
         self.alpha_diversity = 0
         self.beta_diversity = 0
         self.gamma_diversity = 0
         self.number_of_segregating_site = 0
         self.distance = None
-        # # NOTE: Naming and pre-declare variables
+        # # NOTE: Naming and pre-declare variables, avoid unused variable k
 
     def sum_species(self):
         self.microbiome_sum = numpy.array([])
@@ -39,11 +40,23 @@ class Population(object):
     def get_from_parent_and_environment(self):  # parental inheritance and environmental acquisition
         parental_contribution = []
         for i in range(self.number_of_host_in_population):  # select parent for next generation
-            parental_contribution.append(self.composition_of_individual[random.randint(0, self.number_of_environmental_species - 1)].microbiome / float(self.number_of_microbes_in_host))
-        environmental_contribution = addition_of_arrays(self.percentage_of_pooled_environmental_component, 1 - self.percentage_of_pooled_environmental_component, self.microbiome_sum, self.environment)  # mix pooled and fixed env
+            rnd = random.randint(0, self.number_of_environmental_species - 1)
+            parental_contribution.append(
+                self.composition_of_individual[rnd].microbiome / float(self.number_of_microbes_in_host))
+
+        environmental_contribution = addition_of_arrays(
+            self.percentage_of_pooled_environmental_component,
+            1 - self.percentage_of_pooled_environmental_component,
+            self.microbiome_sum, self.environment)  # mix pooled and fixed env
+
         for i in range(self.number_of_host_in_population):  # mix environmental and parental contribution
-            mixed_contribution = addition_of_arrays(1 - self.percentage_of_environmental_acquisition, self.percentage_of_environmental_acquisition, parental_contribution[i], environmental_contribution)
-            self.composition_of_individual[i].microbiome = numpy.random.multinomial(self.number_of_microbes_in_host, mixed_contribution / sum(mixed_contribution))
+            mixed_contribution = addition_of_arrays(
+                1 - self.percentage_of_environmental_acquisition,
+                self.percentage_of_environmental_acquisition,
+                parental_contribution[i], environmental_contribution)
+
+            self.composition_of_individual[i].microbiome = numpy.random.multinomial(
+                self.number_of_microbes_in_host, mixed_contribution / sum(mixed_contribution))
 
     def get_next_gen(self):
         self.get_from_parent_and_environment()
@@ -61,7 +74,8 @@ class Population(object):
         return self.distance
 
     def ratio_of_fixation(self):
-        if self.percentage_of_pooled_environmental_component == 1 or self.percentage_of_environmental_acquisition == 0:
+        if (self.percentage_of_pooled_environmental_component == 1 or
+                self.percentage_of_environmental_acquisition == 0):
             return (self.species_community.tolist().count(0)) / float(self.number_of_environmental_species)
 
     def zero_species(self):
@@ -70,7 +84,8 @@ class Population(object):
     def alpha_diversity(self):
         alpha_diversity_list = []
         for i in range(self.number_of_host_in_population):
-            individual_species_community = self.species_registry.get_species_community(self.composition_of_individual[i].microbiome)
+            individual_species_community = self.species_registry.get_species_community(
+                self.composition_of_individual[i].microbiome)
             individual_species_community = individual_species_community / float(sum(individual_species_community))
             biodiversity = 0
             for k in individual_species_community:
@@ -97,11 +112,14 @@ class Population(object):
                 for j in range(i):
                     fre_i = self.alignment.count(sequence_set[i]) / float(self.number_of_host_in_population)
                     fre_j = self.alignment.count(sequence_set[j]) / float(self.number_of_host_in_population)
-                    self.beta_diversity += fre_i * fre_j * different_element(sequence_set[i], sequence_set[j]) / self.number_of_environmental_species
-            self.beta_diversity = self.beta_diversity * self.number_of_host_in_population / (self.number_of_host_in_population - 1) * 2
-            return self.beta_diversity
-        else:
-            return self.beta_diversity
+                    self.beta_diversity += fre_i * fre_j * different_element(
+                        sequence_set[i], sequence_set[j]) / self.number_of_environmental_species
+#             self.beta_diversity = self.beta_diversity * self.number_of_host_in_population / (self.number_of_host_in_population - 1) * 2
+            self.beta_diversity *= (self.number_of_host_in_population /
+                                    (self.number_of_host_in_population - 1) * 2)
+#             return self.beta_diversity
+#         else:
+        return self.beta_diversity
 
     def segregating_site(self):
         self.number_of_segregating_site = 0
@@ -163,11 +181,23 @@ class Selective_Population(Population):
             running_totals += self.composition_of_individual[i].weighted_fitness
             weighted_fitness_totals.append(running_totals)
         for i in range(self.number_of_host_in_population):  # select parent for next generation
-            parental_contribution.append(self.composition_of_individual[weighted_choice_b(weighted_fitness_totals)].microbiome / float(self.number_of_microbes_in_host))
-        environmental_contribution = addition_of_arrays(self.percentage_of_pooled_environmental_component, 1 - self.percentage_of_pooled_environmental_component, self.microbiome_sum, self.environment)  # mix pooled and fixed env
+            parental_contribution.append(
+                self.composition_of_individual[weighted_choice_b(weighted_fitness_totals)].microbiome /
+                float(self.number_of_microbes_in_host))
+
+        environmental_contribution = addition_of_arrays(
+            self.percentage_of_pooled_environmental_component,
+            1 - self.percentage_of_pooled_environmental_component,
+            self.microbiome_sum, self.environment)  # mix pooled and fixed env
+
         for i in range(self.number_of_host_in_population):  # mix environmental and parental contribution
-            mixed_contribution = addition_of_arrays(1 - self.percentage_of_environmental_acquisition, self.percentage_of_environmental_acquisition, parental_contribution[i], environmental_contribution)
-            self.composition_of_individual[i].microbiome = numpy.random.multinomial(self.number_of_microbes_in_host, mixed_contribution / sum(mixed_contribution))
+            mixed_contribution = addition_of_arrays(
+                1 - self.percentage_of_environmental_acquisition,
+                self.percentage_of_environmental_acquisition,
+                parental_contribution[i], environmental_contribution)
+
+            self.composition_of_individual[i].microbiome = numpy.random.multinomial(
+                self.number_of_microbes_in_host, mixed_contribution / sum(mixed_contribution))
             self.composition_of_individual[i].gene_pool = self.species_registry.get_gene_pool(self.composition_of_individual[i].microbiome)
             new_fitness = sum(numpy.array(self.gene_fitness) * self.composition_of_individual[i].gene_pool) / float(self.number_of_microbes_in_host)
             self.fitness_collection.append(new_fitness)
@@ -192,14 +222,17 @@ class HGT_Population(Selective_Population):
             if hgt_events > 0:
                 x = len(self.species_registry.species_list) - len(self.composition_of_individual[i].microbiome)  # keep host microbiome list of the same length as species registry
                 if x > 0:
-                    self.composition_of_individual[i].microbiome = numpy.array(self.composition_of_individual[i].microbiome.tolist() + [0] * x)
+                    self.composition_of_individual[i].microbiome = numpy.array(
+                        self.composition_of_individual[i].microbiome.tolist() + [0] * x)
                 gene_pool = self.species_registry.get_gene_pool(self.composition_of_individual[i].microbiome)  # gene pool for hgt
                 gene_total = 0
                 cummulative_gene_pool = []
                 for gene in gene_pool:
                     gene_total += gene
                     cummulative_gene_pool.append(gene_total)  # prepare for binary search weighted choice
-                species_for_hgt = numpy.random.multinomial(hgt_events, self.composition_of_individual[i].microbiome / float(self.number_of_microbes_in_host))
+                species_for_hgt = numpy.random.multinomial(
+                    hgt_events, self.composition_of_individual[i].microbiome /
+                    float(self.number_of_microbes_in_host))
                 species_index = 0
                 for j in species_for_hgt:  # j means how many hgt happens for each species
                     if j > 0:
@@ -215,11 +248,14 @@ class HGT_Population(Selective_Population):
                                 new_genotype = (old_genotype ^ removed_gene) | new_gene
                                 new_species = [species_marker, new_genotype]
                                 new_species_index = self.species_registry.find_species(new_species)
-                                self.composition_of_individual[i].microbiome[species_index] = self.composition_of_individual[i].microbiome[species_index] - 1  # old species decrease by 1
+#                                 self.composition_of_individual[i].microbiome[species_index] = self.composition_of_individual[i].microbiome[species_index] - 1  # old species decrease by 1
+                                self.composition_of_individual[i].microbiome[species_index] -= 1
                                 try:
-                                    self.composition_of_individual[i].microbiome[new_species_index] = self.composition_of_individual[i].microbiome[new_species_index] + 1  # new species increase by 1
+#                                     self.composition_of_individual[i].microbiome[new_species_index] = self.composition_of_individual[i].microbiome[new_species_index] + 1  # new species increase by 1
+                                    self.composition_of_individual[i].microbiome[new_species_index] += 1  # new species increase by 1
                                 except IndexError:
-                                    self.composition_of_individual[i].microbiome = numpy.array(self.composition_of_individual[i].microbiome.tolist() + [1])
+                                    self.composition_of_individual[i].microbiome = numpy.array(
+                                        self.composition_of_individual[i].microbiome.tolist() + [1])
                                 if self.composition_of_individual[i].microbiome[species_index] == 0:  # prevent the number of microbes becoming negative
                                     break
                             j = j - 1
