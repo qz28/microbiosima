@@ -18,14 +18,14 @@ def weighted_choice_b(totals):  # weighted selection through binary search (unte
     return bisect.bisect_left(totals, rnd)
 
 
-def addition_of_arrays(x, y, a, b):  # for addition of two numpy.arrays which may have different lengths
+def addition_of_arrays(weight_a, weight_b, array_a, array_b):  # for addition of two numpy.arrays which may have different lengths
     try:
-        c = a * x + b * y
+        c = array_a * weight_a + array_b * weight_b
     except ValueError:
-        d = len(a) - len(b)
+        d = len(array_a) - len(array_b)
         if d > 0:
-            b = numpy.array(b.tolist() + [0] * d)
+            array_b = numpy.array(array_b.tolist() + [0] * d)
         else:
-            a = numpy.array(a.tolist() + [0] * (-d))
-        c = a * x + b * y
+            array_a = numpy.array(array_a.tolist() + [0] * (-d))
+        c = array_a * weight_a + array_b * weight_b
     return c

@@ -44,11 +44,12 @@ def run(species_registry, env, env_factor, pooled_or_fixed, rep):
             print >> file1, population.ratio_of_fixation()
             print >> file4, population
             print >> file6, population.alpha_diversity()
-            print >> file2, population.measure_biodiversity()
+            print >> file2, population.gamma_diversity()
             population.microbiome_sequence_alignment()
             population.segregating_site()
-            print >> file3, str(population.neleotide_diversity_pi()) + '\t' + str(population.number_of_segregating_site)
+            print >> file3, str(population.beta_diversity()) + '\t' + str(population.number_of_segregating_site)
         population.get_next_gen()
+
 
 environment = [1 / float(num_species) for i in range(num_species)]
 species_registry = SpeciesRegistry(num_species)
