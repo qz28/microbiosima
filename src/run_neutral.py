@@ -35,11 +35,11 @@ def run(species_registry, env, env_factor, pooled_or_fixed, rep):
     population = Population(species_registry, env, population_size, microbe_size, env_factor, pooled_or_fixed)
     prefix = str(rep + 1)
     sufix = str(y) + "_" + str(x) + "_" + ".txt"
-    file1 = open(prefix + "_fixation_" + sufix, 'w')
-    file2 = open(prefix + "_gamma_diversity_" + sufix, 'w')
-    file3 = open(prefix + "_beta_diversity_" + sufix, 'w')
-    file4 = open(prefix + "_sum_" + sufix, 'w')
-    file6 = open(prefix + "_alpha_diversity_" + sufix, 'w')
+    file1 = open(prefix + "_fixation" , 'w')
+    file2 = open(prefix + "_gamma_diversity" , 'w')
+    file3 = open(prefix + "_beta_diversity" , 'w')
+    file4 = open(prefix + "_sum", 'w')
+    file6 = open(prefix + "_alpha_diversity", 'w')
     while population.number_of_generation <= number_of_generation:
         population.sum_species()
         if population.number_of_generation % number_generation_for_observation == 0:
