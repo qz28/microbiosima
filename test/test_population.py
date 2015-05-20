@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import unittest
 import numpy
-from microbiosima.microbiosima import SpeciesRegistry
-from microbiosima.microbiosima import Population
+from src.species_registry import SpeciesRegistry
+from src.population import Population
 
 class TestSR(unittest.TestCase):
     def setUp(self):
