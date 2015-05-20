@@ -44,7 +44,7 @@ class Population(object):
             rnd = random.randint(0, self.number_of_environmental_species - 1)
             parental_contribution.append(
                 self.composition_of_individual[rnd].microbiome / float(self.number_of_microbes_in_host))
-
+            self.composition_of_individual[rnd].microbiome *= 2
         environmental_contribution = addition_of_arrays(
             self.percentage_of_pooled_environmental_component,
             1 - self.percentage_of_pooled_environmental_component,
@@ -82,7 +82,7 @@ class Population(object):
     def zero_species(self):
         return self.species_community.values().count(0)
 
-    def alpha_diversity(self):
+    def get_alpha_diversity(self):
         alpha_diversity_list = []
         for i in range(self.number_of_host_in_population):
             individual_species_community = self.species_registry.get_species_community(
@@ -96,7 +96,7 @@ class Population(object):
         self.alpha_diversity = numpy.average(alpha_diversity_list)
         return self.alpha_diversity
 
-    def gamma_diversity(self):  # overall diversity gamma-diversity
+    def get_gamma_diversity(self):  # overall diversity gamma-diversity
         self.gamma_diversity = 0
         for k in self.species_community:
             if k > 0 and k < 1:
@@ -104,7 +104,7 @@ class Population(object):
         return self.gamma_diversity
 
 
-    def beta_diversity(self):
+    def get_beta_diversity(self):
         # FIXME: you can't call this unless you call microbiome_sequence_alignment() first
         sequence_set = list(set(self.alignment))
         self.beta_diversity = 0
