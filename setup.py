@@ -11,17 +11,17 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name = "microbiosima",
-    version = "0.0.4",
-    author = "qz and js and sw",
-    author_email = "",
-    description = (""),
-    license = "BSD",
-    keywords = "",
-    url = "",
-    packages=['microbiosima',],
-    package_dir={'microbiosima': 'neutral'},
-    test_suite = "microbiosima.test",
+    name="microbiosima",
+    version="0.0.4",
+    author="qz and js and sw",
+    author_email="",
+    description=(""),
+    license="BSD",
+    keywords="",
+    url="",
+    packages=['microbiosima', ],
+    package_dir={'microbiosima'},
+    test_suite="microbiosima.test",
     long_description=read('README.txt'),
     classifiers=[
     ],
