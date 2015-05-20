@@ -20,6 +20,8 @@ def weighted_choice_b(totals):  # weighted selection through binary search (unte
 
 def addition_of_arrays(weight_a, weight_b, array_a, array_b):  # for addition of two numpy.arrays which may have different lengths
     try:
+        array_a *= weight_a
+        array_b *= weight_b
         c = array_a * weight_a + array_b * weight_b
     except ValueError:
         d = len(array_a) - len(array_b)

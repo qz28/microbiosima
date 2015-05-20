@@ -16,6 +16,7 @@ try:
     number_generation_for_observation = int(number_generation_for_observation)
     replication = int(replication)
 except ValueError:
+#     print argv
     script, x, y = argv
     y = float(y)
     x = float(x)
@@ -48,11 +49,11 @@ def run(species_registry, env, env_factor, pooled_or_fixed, rep):
             # then use accessor to get values.
             print >> file1, population.ratio_of_fixation()
             print >> file4, population
-            print >> file6, population.alpha_diversity()
-            print >> file2, population.gamma_diversity()
+            print >> file6, population.get_alpha_diversity()
+            print >> file2, population.get_gamma_diversity()
             population.microbiome_sequence_alignment()
             population.segregating_site()
-            print >> file3, str(population.beta_diversity()) + '\t' + str(population.number_of_segregating_site)
+            print >> file3, str(population.get_beta_diversity()) + '\t' + str(population.number_of_segregating_site)
         population.get_next_gen()
 
 
