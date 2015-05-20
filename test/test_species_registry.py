@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 import numpy
-from microbiosima.microbiosima import SpeciesRegistry
+from src.species_registry import SpeciesRegistry
 
 class TestSR(unittest.TestCase):
     def setUp(self):

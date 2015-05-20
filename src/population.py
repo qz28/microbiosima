@@ -4,7 +4,8 @@ import random
 
 import numpy
 
-from Individual import Individual, Selective_Individual
+from individual import Selective_Individual
+from src import individual
 from other_functions import addition_of_arrays, different_element, weighted_choice_b
 
 
@@ -19,7 +20,7 @@ class Population(object):
         self.percentage_of_pooled_environmental_component = pooled_or_fixed  # percentage of pooled environmental component
         self.environment = numpy.array(environment)
         self.species_registry = species_registry
-        self.composition_of_individual = [Individual(
+        self.composition_of_individual = [individual(
             environment, number_of_individual_species, species_registry) for _ in range(number_of_individual)]
         self.alpha_diversity = 0
         self.beta_diversity = 0

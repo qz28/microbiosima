@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 from sys import argv
 
-from Population import Population
-from SpeciesRegistry import SpeciesRegistry
+from src import population
+from src import species_registry
 
 
 try:
@@ -33,7 +33,7 @@ if x < 0 or x > 1 or y < 0 or y > 1:
 
 
 def run(species_registry, env, env_factor, pooled_or_fixed, rep):
-    population = Population(species_registry, env, population_size, microbe_size, env_factor, pooled_or_fixed)
+    population = population(species_registry, env, population_size, microbe_size, env_factor, pooled_or_fixed)
     prefix = str(rep + 1)
     sufix = str(y) + "_" + str(x) + "_" + ".txt"
     file1 = open(prefix + "_fixation_" + sufix, 'w')
@@ -58,7 +58,7 @@ def run(species_registry, env, env_factor, pooled_or_fixed, rep):
 
 
 environment = [1 / float(num_species) for i in range(num_species)]
-species_registry = SpeciesRegistry(num_species)
+species_registry = species_registry(num_species)
 pooled_or_fixed = y
 env_factor = x
 for rep in range(replication):
