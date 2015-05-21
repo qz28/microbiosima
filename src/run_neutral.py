@@ -4,6 +4,7 @@ import sys
 
 from src.population import Population
 from src.species_registry import SpeciesRegistry
+import numpy
 
 MICROBIOSIMA_VERSION = "0.8"
 
@@ -33,16 +34,19 @@ def main():
         """)
 
     parser.add_argument(
-        "--obs", metavar="", type=int, nargs='?',
-        help="Number generation for observation [default: %(default)s]", default=10)
+        "--obs", metavar='', type=int,
+        help="Number generation for observation [default: %(default)s]", default=100)
 
     parser.add_argument(
-        "--rep", metavar="", type=int, nargs='?',
-        help="Number of replication [default:  %(default)s]", default=1)
+        "--rep", metavar='', type=int,
+        help="Number of replication [default: %(default)s]", default=1)
 
     args = parser.parse_args()
 
+    print numpy.__version__
     try:
+        if args.config == [50, 200, 20, 50]:
+            print "WARNING! defalut parameters are use."
         population_size, microbe_size, num_species, number_of_generation = args.config
     except ValueError:
         print "ERROR: config requires exactly 4 arguments! It has %d here %s. EXIT!" % (len(args.config), args.config)
@@ -59,6 +63,11 @@ def main():
     if pct_pool < 0 or pct_pool > 1:
         print "ERROR: pct_pool (Percentage of pooled environmental component must) must be between 0 and 1 (pct_pool=%f)! EXIT" % pct_pool
         sys.exit(2)
+
+    if replication < 1:
+        print "ERROR: Number of replication must be >= 1 (rep=%d)! EXIT" % replication
+        sys.exit(2)
+
 
     def run(species_registry, env, env_factor, pooled_or_fixed, rep):
         population = Population(species_registry, env, population_size, microbe_size, env_factor, pooled_or_fixed)
