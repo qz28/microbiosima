@@ -2,15 +2,15 @@
 
 A collection of python scripts that simulates the evolutionary and ecological dynamics of microbiomes within a population of hosts.
 
-
-## Requirement
+##Python Version
+### Requirement
 * [**python**](https://www.python.org/) 2.7
   * This program is not tested with python 3.0+
 * [**NumPy**](http://www.numpy.org/) 1.8.2+
 
 
 
-##Components of python scripts
+###Components of python scripts
 
 The simulation project can be divided into several parts, and currently we have
 finished the neutral framework of microbiome evolution.
@@ -34,7 +34,7 @@ finished the neutral framework of microbiome evolution.
     4. the environmental composition affected by hosts
 
 
-##Parameters
+###Parameters
 
 Under our neutral model, several parameters are adjustable:
 
@@ -47,16 +47,16 @@ Under our neutral model, several parameters are adjustable:
   7. number generation for observation: every this many generations the diversities and other summary statistics are calculated
   8. replication: the number of simulation with the same parameters you want to repeat  
 
-##Usage
+###Usage
 
-#### Help Menu
+##### Help Menu
 ```
 python src/run_neutral.py -h
 ```
 
-#### Case 1
+##### Case 1
 ```
-cd microbiosima
+cd microbiosima/python
 python src/run_neutral.py 0.2 0.5 50 200 20 50
 #python src/run_neutral.py arg0 arg1 arg2 arg3 arg4 arg5
 ```
@@ -70,12 +70,12 @@ To run the simulation from terminal with six arguments taken.
 
 
 
-#### Case 2
+##### Case 2
 
 
 Only two arguments provided for percentage of environmental acquisition, and percentage of pooled component in the environment.
 ```
-cd microbiosima
+cd microbiosima/python
 python src/run_neutral.py 0.2 0.5
 #python src/run_neutral.py pct_env pct_pool
 #Effectively equals
@@ -88,7 +88,7 @@ the default settings for other parameters are following:
   - number of generations=10000
 
 
-#### Additional parameters
+##### Additional parameters
   - `--obs` Number generation for observation [default: 100]
   - `--rep`Number of replication [default: 1]
 ```
@@ -96,7 +96,7 @@ cd microbiosima
 python src/run_neutral.py 0.2 0.5 50 200 20 50 --obs 10 --rep 3
 ```
 
-##Output File format
+###Output File format
 
 The format of output filename is "a1_text_a2_a3.txt"
 - a1: the number of replicated times
@@ -109,6 +109,20 @@ The format of output filename is "a1_text_a2_a3.txt"
   - fixation: fixation time (only ofr pure pooled environment and parental inheritance)
   - sum: the relative abundances of microbial species within population
 
-##Develop
+
+##Java Version
+### Requirement:
+   * [**Java 8**](https://www.java.com/)
+   * [Apache Commons Math: 3.5+](http://commons.apache.org/proper/commons-math/)
+
+
+### Usage
+```
+java -jar microbibiosima.jar
+```
+
+
+
+##Development
 
 Our selection and HGT model are still under developing process.
