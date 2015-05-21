@@ -67,7 +67,8 @@ To run the simulation from terminal with six arguments taken.
   - arg3: microbe size
   - arg4; number of species
   - arg5: number of generations
-All parameters are required
+
+All parameters are required.
 
 
 
