@@ -61,12 +61,12 @@ python src/run_neutral.py 0.2 0.5 50 200 20 50
 #python src/run_neutral.py arg0 arg1 arg2 arg3 arg4 arg5
 ```
 To run the simulation from terminal with six arguments taken.
-    - arg0: pct_env, percentage of environmental acquisition
-    - arg1: pct_pool, percentage of pooled component in the environment
-    - arg2: population size
-    - arg3: microbe size
-    - arg4; number of species
-    - arg5: number of generations
+- arg0: pct_env, percentage of environmental acquisition
+- arg1: pct_pool, percentage of pooled component in the environment
+- arg2: population size
+- arg3: microbe size
+- arg4; number of species
+- arg5: number of generations
 
 
 
