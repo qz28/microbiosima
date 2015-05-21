@@ -69,7 +69,11 @@ To run the simulation from terminal with six arguments taken.
   - arg5: number of generations
 
 
+
+
+
 * Case 2:
+
 
 Only two arguments provided for percentage of environmental acquisition, and percentage of pooled component in the environment.
 ```
