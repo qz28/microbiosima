@@ -33,5 +33,4 @@ def addition_of_arrays(weight_a, weight_b, array_a, array_b):  # for addition of
     return c
 
 
-def addition_of_arrays_v2(array_a, array_b, weight_a=1, weight_b=1):
-    pass
+

@@ -4,9 +4,8 @@ import random
 
 import numpy
 
-from individual import Selective_Individual
-from src import individual
-from other_functions import addition_of_arrays, different_element, weighted_choice_b
+from individual import Individual
+from other_functions import addition_of_arrays, different_element
 
 
 class Population(object):
@@ -20,7 +19,7 @@ class Population(object):
         self.percentage_of_pooled_environmental_component = pooled_or_fixed  # percentage of pooled environmental component
         self.environment = numpy.array(environment)
         self.species_registry = species_registry
-        self.composition_of_individual = [individual(
+        self.composition_of_individual = [Individual(
             environment, number_of_individual_species, species_registry) for _ in range(number_of_individual)]
         self.alpha_diversity = 0
         self.beta_diversity = 0
@@ -29,7 +28,7 @@ class Population(object):
         self.distance = None
         self.beta_diversity_coef = (self.number_of_host_in_population /
                                     (self.number_of_host_in_population - 1) * 2)
-        # # NOTE: Naming and pre-declare variables, avoid unused variable k
+
 
     def sum_species(self):
         self.microbiome_sum = numpy.array([])
@@ -143,7 +142,7 @@ class Population(object):
         for individual in self.composition_of_individual:
             self.alignment.append(individual.__str__())
 
-    def watterson_tajima(self):
+    def watterson_tajima(self):  # http://en.wikipedia.org/wiki/Tajima%27s_D
         a_1 = 0
         a_2 = 0
         for i in range(1, self.number_of_host_in_population):
@@ -170,121 +169,4 @@ class Population(object):
 
     def __str__(self):
         return '\t'.join([str(k) for k in self.species_community])
-
-
-class Selective_Population(Population):
-    def __init__(self, species_registry, environment, number_of_individual,
-                 number_of_individual_species, gene_fitness,
-                 environmental_factor, pooled_or_fixed):
-        super(Selective_Population, self).__init__(
-            species_registry, environment, number_of_individual,
-            number_of_individual_species, environmental_factor, pooled_or_fixed)
-        self.gene_fitness = gene_fitness  # fitness of each gene contributing to host
-        self.composition_of_individual = [Selective_Individual(
-            environment, number_of_individual_species, species_registry, gene_fitness) for _ in range(number_of_individual)]
-        self.fitness_collection = [individual.fitness for individual in self.composition_of_individual]  # record the host fitness of each generation
-
-    def get_from_parent_and_environment(self):  # parental inheritance and environmental acquisition
-        parental_contribution = []
-        self.fitness_collection = []
-        weighted_fitness_totals = []
-        running_totals = 0
-        for i in range(self.number_of_host_in_population):  # preparing for binary search weighted choice
-            running_totals += self.composition_of_individual[i].weighted_fitness
-            weighted_fitness_totals.append(running_totals)
-        for i in range(self.number_of_host_in_population):  # select parent for next generation
-            parental_contribution.append(
-                self.composition_of_individual[weighted_choice_b(weighted_fitness_totals)].microbiome /
-                float(self.number_of_microbes_in_host))
-
-        environmental_contribution = addition_of_arrays(
-            self.percentage_of_pooled_environmental_component,
-            1 - self.percentage_of_pooled_environmental_component,
-            self.microbiome_sum, self.environment)  # mix pooled and fixed env
-
-        for i in range(self.number_of_host_in_population):  # mix environmental and parental contribution
-            mixed_contribution = addition_of_arrays(
-                1 - self.percentage_of_environmental_acquisition,
-                self.percentage_of_environmental_acquisition,
-                parental_contribution[i], environmental_contribution)
-
-            self.composition_of_individual[i].microbiome = numpy.random.multinomial(
-                self.number_of_microbes_in_host, mixed_contribution / sum(mixed_contribution))
-            self.composition_of_individual[i].gene_pool = self.species_registry.get_gene_pool(self.composition_of_individual[i].microbiome)
-            new_fitness = sum(numpy.array(self.gene_fitness) *
-                              self.composition_of_individual[i].gene_pool) / float(self.number_of_microbes_in_host)
-            self.fitness_collection.append(new_fitness)
-            self.composition_of_individual[i].weighted_fitness = 1 ** new_fitness  # no selection
-
-    def average_of_fitness(self):
-        return numpy.average(self.fitness_collection)
-
-    def variance_of_fitness(self):
-        return numpy.var(self.fitness_collection)
-
-
-class HGT_Population(Selective_Population):
-    def __init__(self, species_registry, environment, number_of_individual, number_of_individual_species, gene_fitness, environmental_factor, pooled_or_fixed, hgt_rate):
-        super(HGT_Population, self).__init__(species_registry, environment, number_of_individual, number_of_individual_species, gene_fitness, environmental_factor, pooled_or_fixed)
-        self.hgt_rate = hgt_rate
-        self.random_binary_index = [2 ** k for k in range(species_registry.number_of_total_genes)]
-
-    def get_from_gene_pool(self):
-        for i in range(self.number_of_host_in_population):
-            hgt_events = numpy.random.poisson(self.hgt_rate)  # determine how many hgt events happen for each host
-            if hgt_events > 0:
-                x = len(self.species_registry.species_list) - len(self.composition_of_individual[i].microbiome)  # keep host microbiome list of the same length as species registry
-                if x > 0:
-                    self.composition_of_individual[i].microbiome = numpy.array(
-                        self.composition_of_individual[i].microbiome.tolist() + [0] * x)
-                gene_pool = self.species_registry.get_gene_pool(self.composition_of_individual[i].microbiome)  # gene pool for hgt
-                gene_total = 0
-                cummulative_gene_pool = []
-                for gene in gene_pool:
-                    gene_total += gene
-                    cummulative_gene_pool.append(gene_total)  # prepare for binary search weighted choice
-                species_for_hgt = numpy.random.multinomial(
-                    hgt_events, self.composition_of_individual[i].microbiome /
-                    float(self.number_of_microbes_in_host))
-                species_index = 0
-                for j in species_for_hgt:  # j means how many hgt happens for each species
-                    if j > 0:
-                        old_genotype = self.species_registry.species_list[species_index][1]
-                        species_marker = self.species_registry.species_list[species_index][0]
-                        while j > 0:
-                            new_gene = 2 ** (weighted_choice_b(cummulative_gene_pool))
-                            if old_genotype | new_gene != old_genotype:
-                                random.shuffle(self.random_binary_index)
-                                for removed_gene in self.random_binary_index:
-                                    if old_genotype | removed_gene == old_genotype:  # randomly remove one gene from the genotype
-                                        break
-                                new_genotype = (old_genotype ^ removed_gene) | new_gene
-                                new_species = [species_marker, new_genotype]
-                                new_species_index = self.species_registry.find_species(new_species)
-#                                 self.composition_of_individual[i].microbiome[species_index] = self.composition_of_individual[i].microbiome[species_index] - 1  # old species decrease by 1
-                                self.composition_of_individual[i].microbiome[species_index] -= 1
-                                try:
-                                    self.composition_of_individual[i].microbiome[new_species_index] += 1  # new species increase by 1
-#                                     self.composition_of_individual[i].microbiome[new_species_index] = self.composition_of_individual[i].microbiome[new_species_index] + 1  # new species increase by 1
-                                except IndexError:
-                                    self.composition_of_individual[i].microbiome = numpy.array(
-                                        self.composition_of_individual[i].microbiome.tolist() + [1])
-                                if self.composition_of_individual[i].microbiome[species_index] == 0:  # prevent the number of microbes becoming negative
-                                    break
-                            j = j - 1
-                    species_index += 1
-            self.composition_of_individual[i].gene_pool = self.species_registry.get_gene_pool(self.composition_of_individual[i].microbiome)
-            new_fitness = sum(numpy.array(self.gene_fitness) * self.composition_of_individual[i].gene_pool) / float(self.number_of_microbes_in_host)
-            self.fitness_collection.append(new_fitness)
-            self.composition_of_individual[i].weighted_fitness = 1 ** new_fitness
-
-    def get_next_gen(self):
-        self.get_from_parent_and_environment()
-        if self.hgt_rate > 0:
-            self.get_from_gene_pool()
-        self.pre_species_community = self.species_community
-        self.number_of_generation += 1
-
-
-
 
