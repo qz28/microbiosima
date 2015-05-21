@@ -37,14 +37,15 @@ finished the neutral framework of microbiome evolution.
 ##Parameters
 
 Under our neutral model, several parameters are adjustable:
-1. pct_evn: Percentage of environmental acquisition, 1-pct_evn is the proportion of parental inheritance.
-2. pct_pool: Percentage of pooled component in the environment.
-3. population size: the population size of hosts.
-4. microbe size: number of microbes associated with one host
-5. number of species: the total number of species in the environment
-6. number of generations: the number of host generations that will be simulated
-7. number generation for observation: every this many generations the diversities and other summary statistics are calculated
-8. replication: the number of simulation with the same parameters you want to repeat  
+
+  1. pct_evn: Percentage of environmental acquisition, 1-pct_evn is the proportion of parental inheritance.
+  2. pct_pool: Percentage of pooled component in the environment.
+  3. population size: the population size of hosts.
+  4. microbe size: number of microbes associated with one host
+  5. number of species: the total number of species in the environment
+  6. number of generations: the number of host generations that will be simulated
+  7. number generation for observation: every this many generations the diversities and other summary statistics are calculated
+  8. replication: the number of simulation with the same parameters you want to repeat  
 
 ##Usage
 
@@ -68,9 +69,9 @@ To run the simulation from terminal with six arguments taken.
   - arg5: number of generations
 
 
- * Case 2:
+* Case 2:
 
-  Only two arguments provided for percentage of environmental acquisition, and percentage of pooled component in the environment.
+Only two arguments provided for percentage of environmental acquisition, and percentage of pooled component in the environment.
 ```
 cd microbiosima
 python src/run_neutral.py 0.2 0.5
