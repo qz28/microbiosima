@@ -49,31 +49,28 @@ Under our neutral model, several parameters are adjustable:
 
 ##Usage
 
-* Help Menu
+#### Help Menu
 ```
 python src/run_neutral.py -h
 ```
 
-* Case 1:
+#### Case 1
 ```
 cd microbiosima
 python src/run_neutral.py 0.2 0.5 50 200 20 50
 #python src/run_neutral.py arg0 arg1 arg2 arg3 arg4 arg5
 ```
 To run the simulation from terminal with six arguments taken.
-  - arg0: pct_env, percentage of environmental acquisition
-  - arg1: pct_pool, percentage of pooled component in the environment
-  - arg2: population size
-  - arg3: microbe size
-  - arg4; number of species
-  - arg5: number of generations
-
-All parameters are required.
+    - arg0: pct_env, percentage of environmental acquisition
+    - arg1: pct_pool, percentage of pooled component in the environment
+    - arg2: population size
+    - arg3: microbe size
+    - arg4; number of species
+    - arg5: number of generations
 
 
 
-
-* Case 2:
+#### Case 2
 
 
 Only two arguments provided for percentage of environmental acquisition, and percentage of pooled component in the environment.
@@ -91,7 +88,7 @@ the default settings for other parameters are following:
   - number of generations=10000
 
 
-* Additional parameters:
+#### Additional parameters
   - `--obs` Number generation for observation [default: 100]
   - `--rep`Number of replication [default: 1]
 ```
