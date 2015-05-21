@@ -2,8 +2,8 @@
 import argparse
 import sys
 
-from src.population import Population
-from src.species_registry import SpeciesRegistry
+from population import Population
+from species_registry import SpeciesRegistry
 import numpy
 
 MICROBIOSIMA_VERSION = "0.8"

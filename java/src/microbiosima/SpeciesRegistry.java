@@ -1,13 +1,10 @@
-
-
 package microbiosima;
-
 /**
  *
  * @author John
  */
 
-
+@Deprecated
 public class SpeciesRegistry {
 	private int initialNumberOfSpecies;
 
@@ -15,3 +12,4 @@ public class SpeciesRegistry {
 		this.initialNumberOfSpecies = initialNumberOfSpecies;
 	}
 }
+

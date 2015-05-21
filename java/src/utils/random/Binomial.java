@@ -20,8 +20,6 @@
 
 package utils.random;
 
-import java.util.Random;
-
 /**
  *
  * @author John

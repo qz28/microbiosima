@@ -32,7 +32,7 @@ public class Distance {
 			double diff = v1[i] - v2[i];
 			distance += diff * diff;
 		}
-		//TODO: check length
+
 		return Math.sqrt(distance);
 	}
 }

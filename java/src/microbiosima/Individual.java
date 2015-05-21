@@ -1,5 +1,3 @@
-
-
 package microbiosima;
 
 import utils.random.Multinomial2;
@@ -10,9 +8,9 @@ import utils.random.Multinomial2;
  */
 public class Individual {
 
-	double[] microbiome;//NOTE: is that possible to use int[]
+	double[] microbiome;
 	private int numberEnvironmentalSpecies;
-	private int numberMicrobePerHost;
+	
 	
 	public Individual(Multinomial2 MultDist, int nomph, int noes) {
 		numberEnvironmentalSpecies = noes;
@@ -46,4 +44,9 @@ public class Individual {
 		return sb.toString().trim();
 	}
 
+	@Deprecated
+	private int numberMicrobePerHost;
+	
 }
+
+

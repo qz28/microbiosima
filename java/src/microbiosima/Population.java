@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import utils.DifferentElement;
@@ -21,38 +20,40 @@ import utils.random.Multinomial2;
  * @author John
  */
 public class Population {
-	//FIXME: encapsulation these fields, way too many public
-	final int numberOfMicrobePerHost;
-	final int numberOfEnvironmentalSpecies;
-	final int numberOfIndividual;
-	final double environmentalFactor;
-	final double percentageOfpooledOrFixed;
-	
-	private int numberOfGeneration;
+
 	double[] initialEnvironment;
 	double[] microbiomeSum;
-	private double g_diversity;
-	private double a_diversity;
-	private double b_diversity;
-        private double weighted_b_diversity;
-	private String[] alignment;
-	
 	double[][] parentalContribution;
 	double[] environmentalContribution;
 	double[] mixedContribution;
 	double coefficient;
+	
+	private final int numberOfMicrobePerHost;
+	private final int numberOfEnvironmentalSpecies;
+	private final int numberOfIndividual;
+	private final double environmentalFactor;
+	private final double percentageOfPooledFixed;
+	
+	private int numberOfGeneration;
+	private double g_diversity;
+	private double a_diversity;
+	private double b_diversity;
+    private double weighted_b_diversity;
+	private String[] alignment;
+	
 	private int sampleReplicates;
 	private int numberOfSamples;
 	private double[] previous_microbiomes;
-	private Individual[] compositionOfIndividuals;
+	private double beta_diversity_coef;
+    private double beta_diversity_coef_2;
+    private double beta_diversity_coef_3;
+    private double beta_diversity_coef_4;
+	
+    private Individual[] compositionOfIndividuals;
 	private List<Set<Integer>> samples = new ArrayList<>();
 	private List<Integer> host_index = new ArrayList<>();
-	private double beta_diversity_coef;
-        private double beta_diversity_coef_2;
-        private double beta_diversity_coef_3;
-        private double beta_diversity_coef_4;
 	
-	Multinomial2 multiNomialDist;
+	private Multinomial2 multiNomialDist;
 	
 	public Population(int numberOfMicrobePerHost, double[] environment, int noOfIndividual, 
 			double environmentalFactor,
@@ -61,16 +62,16 @@ public class Population {
 		this.numberOfEnvironmentalSpecies = environment.length;
 		this.numberOfIndividual = noOfIndividual;
 		this.environmentalFactor = environmentalFactor;
-		this.percentageOfpooledOrFixed = pooledOrFiexd;//NOTE: "or" sounds like a boolean variable
+		this.percentageOfPooledFixed = pooledOrFiexd;
 		
 		this.numberOfGeneration = 0;
 		this.sampleReplicates = sampleReplicates0;				
 		this.numberOfSamples = numberOfSamples;
-		coefficient = (1 - environmentalFactor) / this.numberOfMicrobePerHost; //NOTE: change to this.
+		coefficient = (1 - environmentalFactor) / this.numberOfMicrobePerHost;
 		initialEnvironment = environment;
 		
 		compositionOfIndividuals = new Individual[numberOfIndividual];
-		parentalContribution = new double[noOfIndividual][numberOfEnvironmentalSpecies];//NOTE: change to numberOfIndividual
+		parentalContribution = new double[noOfIndividual][numberOfEnvironmentalSpecies];
 		microbiomeSum = new double[numberOfEnvironmentalSpecies];
 		environmentalContribution = new double[numberOfEnvironmentalSpecies];
 		mixedContribution = new double[numberOfEnvironmentalSpecies];
@@ -78,16 +79,17 @@ public class Population {
 		
 		multiNomialDist = new Multinomial2(numberOfEnvironmentalSpecies);
 		
-		beta_diversity_coef = 2.0  / numberOfIndividual
-				/ (numberOfIndividual - 1)
-				/ numberOfEnvironmentalSpecies;
-                beta_diversity_coef_2= 1.0  / numberOfIndividual
-				/ (numberOfIndividual - 1)
-				/ numberOfMicrobePerHost;
-                beta_diversity_coef_3=1.0/numberOfSamples/(numberOfSamples-1)/numberOfMicrobePerHost/sampleReplicates;
-                beta_diversity_coef_4 = 2.0  / numberOfSamples
-				/ (numberOfSamples - 1)
-				/ numberOfEnvironmentalSpecies/sampleReplicates;
+		alignment = new String[numberOfIndividual];
+		
+		beta_diversity_coef = 2.0 / numberOfIndividual
+				/ (numberOfIndividual - 1) / numberOfEnvironmentalSpecies;
+		beta_diversity_coef_2 = 1.0 / numberOfIndividual
+				/ (numberOfIndividual - 1) / numberOfMicrobePerHost;
+		beta_diversity_coef_3 = 1.0 / numberOfSamples / (numberOfSamples - 1)
+				/ numberOfMicrobePerHost / sampleReplicates;
+		beta_diversity_coef_4 = 2.0 / numberOfSamples / (numberOfSamples - 1)
+				/ numberOfEnvironmentalSpecies / sampleReplicates;
+		
 		for (int i = 0; i < numberOfIndividual; i++) {
 			host_index.add(i);
 		}
@@ -116,12 +118,11 @@ public class Population {
 	}
 
 	public void microbiomeSequenceAlignment() {
-		alignment = new String[numberOfIndividual];//NOTE: pre declared this somewhere
+		
 		int i = 0;
 		for (Individual host : getIndividuals()) {
 			alignment[i] = host.microbial_sequences();
-			i++;//NOTE: Since you use i++ here, might be better with standard for loop
-//			for (int j = 0; j < compositionOfIndividuals.length; j++) {
+			i++;
 		}
 	}
 
@@ -135,7 +136,7 @@ public class Population {
 
 	public double environmentPopulationDistance() {
 		if (getNumberOfGeneration() == 0)
-			//TODO: can we merge these two??
+
 			return Distance.getDistance(initialEnvironment, microbiomeSum);
 		else
 			return Distance.getDistance(environmentalContribution,
@@ -150,11 +151,9 @@ public class Population {
 			System.arraycopy(compositionOfIndividuals[MathUtil.getNextInt(numberOfIndividual-1)].getMicrobiome(),
                                 0,parentalContribution[i], 0,numberOfEnvironmentalSpecies);
 		}
-		//NOTE: Maybe we can merge some of these environmentalContribution, mixedContribution, parentalContribution
-		//These fields are not used at other places
 		
 		VectorAddition.additionOfVectors(environmentalContribution,
-				percentageOfpooledOrFixed, 1 - percentageOfpooledOrFixed, microbiomeSum,
+				percentageOfPooledFixed, 1 - percentageOfPooledFixed, microbiomeSum,
 				initialEnvironment);
 
 		for (int i = 0; i < numberOfIndividual; i++) {
@@ -175,22 +174,8 @@ public class Population {
 			samples.set(i,
 					RandomSample.randomSample(host_index, numberOfSamples));
 		}
-		
-//		for (int i = 0; i < numberOfEnvironmentalSpecies; i++) {
-//			previous_microbiomes[i] = microbiomeSum[i];
-//		}
-		//NOTE: System.arraycopy is faster
 		System.arraycopy(microbiomeSum, 0, previous_microbiomes, 0, microbiomeSum.length);
-
-		//example of IDE overdo it
-//		setNumberOfGeneration(getNumberOfGeneration() + 1);
 		numberOfGeneration++;
-	}
-
-	private static double getPlogP(double abundance, int normaliser) {
-		double relative_abundance = abundance / normaliser;
-		double pLogP = relative_abundance * Math.log(relative_abundance);
-		return pLogP;
 	}
 
 	public double alphaDiversity(boolean sampleOrNot) {
@@ -247,7 +232,7 @@ public class Population {
 				int m = 0;
 				for (Integer index : sample) {
 					temp_alignment[m] = alignment[index];
-					m++;//NOTE: for loop or arrayList, track one less variable
+					m++;
 				}
 				for (int i = 1; i < numberOfSamples; i++) {
 					for (int j = 0; j < i; j++) {
@@ -329,10 +314,6 @@ public class Population {
             }
         }
 
-	private static double getPlogP(double abundance) {
-		return getPlogP(abundance, 1);
-	}
-
 	public String printOut() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 1; i < numberOfEnvironmentalSpecies; i++) {
@@ -340,10 +321,10 @@ public class Population {
 		}
 		return sb.toString().trim();
 	}
-        
-        public Individual[] getIndividuals(){
-            return compositionOfIndividuals;
-        }
+    
+    public Individual[] getIndividuals(){
+        return compositionOfIndividuals;
+    }
 
 	public int getNumberOfGeneration() {
 		return numberOfGeneration;
@@ -352,6 +333,16 @@ public class Population {
 	public void resetGeneration() {
 		numberOfGeneration = 0;
 		
+	}
+
+	private static double getPlogP(double abundance) {
+		return getPlogP(abundance, 1);
+	}
+
+	private static double getPlogP(double abundance, int normaliser) {
+		double relative_abundance = abundance / normaliser;
+		double pLogP = relative_abundance * Math.log(relative_abundance);
+		return pLogP;
 	}
         
      
