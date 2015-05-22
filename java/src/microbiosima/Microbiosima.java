@@ -43,11 +43,8 @@ public class Microbiosima {
 		int Nm = 1000;// Integer.parseInt(parameters[2]);
 		int No = 150;// Integer.parseInt(parameters[3]);
 		int Ng = 10000;
-		int input = Integer.parseInt(args[0]);
-		int x = input / 11;
-		int y = input % 11;
-		double pooled_or_fixed = 1 - Math.exp(-x);
-		double environmental_factor = Math.exp(-y);
+		double pooled_or_fixed = Double.parseDouble(arg[0]);
+		double environmental_factor = Double.parseDouble(arg[1]);
 		double[] environment = new double[No];
 		for (int i = 0; i < No; i++) {
 			environment[i] = 1 / (double) No;
