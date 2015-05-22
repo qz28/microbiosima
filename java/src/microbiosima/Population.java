@@ -74,13 +74,13 @@ public class Population {
 	private Multinomial2 multiNomialDist;
 	
 	public Population(int numberOfMicrobePerHost, double[] environment, int noOfIndividual, 
-			double environmentalFactor,
-			double pooledOrFiexd, int numberOfSamples, int sampleReplicates0) throws IOException {
+			double environmentalFactor, double percentageOfPooledFixed, 
+			int numberOfSamples, int sampleReplicates0) throws IOException {
 		this.numberOfMicrobePerHost = numberOfMicrobePerHost;
 		this.numberOfEnvironmentalSpecies = environment.length;
 		this.numberOfIndividual = noOfIndividual;
 		this.environmentalFactor = environmentalFactor;
-		this.percentageOfPooledFixed = pooledOrFiexd;
+		this.percentageOfPooledFixed = percentageOfPooledFixed;
 		
 		this.numberOfGeneration = 0;
 		this.sampleReplicates = sampleReplicates0;				
@@ -115,7 +115,7 @@ public class Population {
 			samples.add(RandomSample.randomSample(host_index,
 					this.numberOfSamples));
 		}
-                multiNomialDist.updateProb(initialEnvironment);
+        multiNomialDist.updateProb(initialEnvironment);
 		for (int i = 0; i < noOfIndividual; i++) {
 			compositionOfIndividuals[i] = new Individual(
 					multiNomialDist, this.numberOfMicrobePerHost,
