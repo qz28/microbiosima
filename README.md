@@ -130,7 +130,7 @@ finished the neutral framework of microbiome evolution.
 
 ### Install
 #### Option 1:
-Download microbiosima_v\*.\*.tar.gz and uncompress it. Run it from terminal with
+Download `microbiosima_*.tar.gz` and uncompress it. Run it from terminal with
 ```bash
 ./bin/microbiosima
 ```
