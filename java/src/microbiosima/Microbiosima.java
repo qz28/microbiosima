@@ -72,10 +72,11 @@ public class Microbiosima {
 		options.addOption(version);
 		
 		options.addOption(Option.builder("o").longOpt("obs").hasArg()
-				.argName("OBS").desc("Number generation for observation")
+				.argName("OBS").desc("Number generation for observation [default: 100]")
 				.build());
 		options.addOption(Option.builder("r").longOpt("rep").hasArg()
-				.argName("REP").desc("Number of replication").build());
+				.argName("REP").desc("Number of replication [default: 1]")
+				.build());
 					
 		Builder C = Option.builder("c").longOpt("config")
 				.numberOfArgs(4).argName("Pop Micro Spec Gen")

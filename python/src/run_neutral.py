@@ -63,11 +63,11 @@ def main():
         )
 
     parser.add_argument(
-        "--obs", metavar='OBS', type=int,
+        "-o", "--obs", metavar='OBS', type=int,
         help="Number generation for observation [default: %(default)s]", default=100)
 
     parser.add_argument(
-        "--rep", metavar='REP', type=int,
+        "-r", "--rep", metavar='REP', type=int,
         help="Number of replication [default: %(default)s]", default=1)
 
     args = parser.parse_args()
