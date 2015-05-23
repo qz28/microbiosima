@@ -3,7 +3,7 @@
 Simulates the evolutionary and ecological dynamics of microbiomes within a population of hosts.
 
 There are two versions of this program
-* [Python version](#python-ersion)
+* [Python version](#python-version)
 * [Java version](#java-version)
 
 ###Parameters
@@ -24,30 +24,6 @@ Under our neutral model, several parameters are adjustable:
   * This program is not tested with python 3.0+
 * [**NumPy**](http://www.numpy.org/) 1.8.2+
 
-
-
-###Components of python scripts
-
-The simulation project can be divided into several parts, and currently we have
-finished the neutral framework of microbiome evolution.
-
-- SpeciesRegistry
-  - Initialize the information of all the microbial species in our system.
-  - provides records of the genotypes of all the microbial species
-
-
-- Individual:
-  - simulate a individual host
-  - keep records of the microbial abundance information within the host
-
-
-- Population
-  - simulate a population of hosts and their collection of microbiomes
-  - simulate all the process that involves in alternation of host-associated communities
-    1. the substitution by new offspring
-    2. the parental inheritance of microbial communities
-    3. the environmental acquistion of microbiome communities
-    4. the environmental composition affected by hosts
 
 
 ###Usage
@@ -78,15 +54,15 @@ the default settings for other parameters are following:
 ```bash
 cd microbiosima/python
 python src/run_neutral.py 0.2 0.5 -c 50 200 20 50
-#python src/run_neutral.py pct_env pct_pool -c arg2 arg3 arg4 arg5
+#python src/run_neutral.py pct_env pct_pool -c Pop Micro Spec Gen
 ```
 To run the simulation from terminal with six arguments taken.
-- pct_env, percentage of environmental acquisition
-- pct_pool, percentage of pooled component in the environment
-- arg2: population size
-- arg3: microbe size
-- arg4; number of species
-- arg5: number of generations
+- pct_env: percentage of environmental acquisition
+- pct_pool: percentage of pooled component in the environment
+- Pop: population size
+- Micro: microbe size
+- Spce: number of species
+- Gen: number of generations
 
 
 
@@ -101,7 +77,7 @@ python src/run_neutral.py 0.2 0.5 50 200 20 50 --obs 10 --rep 3
 
 ###Output File format
 
-The format of output filename is "a1_text_a2_a3.txt"
+The format of output filename is "{a1}_text_E{a2}_P{a3}.txt"
 - a1: the number of replicated times
 - a2: pct_env, percentage of environmental acquisition
 - a3: pct_pool, percentage of pooled component in the environment
@@ -121,6 +97,31 @@ python setup.py install
 # OR at users directory
 python setup.py install --user
 ```
+
+
+###Components of python scripts
+
+The simulation project can be divided into several parts, and currently we have
+finished the neutral framework of microbiome evolution.
+
+- SpeciesRegistry
+  - Initialize the information of all the microbial species in our system.
+  - provides records of the genotypes of all the microbial species
+
+
+- Individual:
+  - simulate a individual host
+  - keep records of the microbial abundance information within the host
+
+
+- Population
+  - simulate a population of hosts and their collection of microbiomes
+  - simulate all the process that involves in alternation of host-associated communities
+    1. the substitution by new offspring
+    2. the parental inheritance of microbial communities
+    3. the environmental acquistion of microbiome communities
+    4. the environmental composition affected by hosts
+
 
 
 ##Java Version
@@ -170,15 +171,15 @@ the default settings for other parameters are following:
 
 ```bash
 ./bin/microbiosima 0.2 0.5 -c 50 200 20 50
-#./bin/microbiosima arg0 arg1 -c arg2 arg3 arg4 arg5
+#./bin/microbiosima pctEnv pctPool -c Pop Micro Spec Gen
 ```
 To run the simulation from terminal with six arguments taken.
-- pct_env: percentage of environmental acquisition
-- pct_pool: percentage of pooled component in the environment
-- arg2: population size
-- arg3: microbe size
-- arg4; number of species
-- arg5: number of generations
+- pctEnv: percentage of environmental acquisition
+- pctPool: percentage of pooled component in the environment
+- Pop: population size
+- Micro: microbe size
+- Spce: number of species
+- Gen: number of generations
 
 
 
@@ -191,4 +192,4 @@ To run the simulation from terminal with six arguments taken.
 
 ##Development
 
-Our selection and HGT model are still under developing process.
+Our selection and horizontal gene transfer (HGT) model are still under developing process.
