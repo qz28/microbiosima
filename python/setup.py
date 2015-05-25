@@ -33,14 +33,18 @@ setup(
     author="Qinglong Zeng, Jeet Sukumaran, Steven Wu and Allen Rodrigo",
     author_email="qinglong.zeng@duke.edu",
     description="Simulates the evolutionary and ecological dynamics of microbiomes within a population of hosts.",
-    license="GPL",
+    license="GPLv3+",
     keywords="microbiomes netural model",
     url="https://github.com/qz28/microbiosima",
-    packages=['src' ],
+    packages=['microbiosima' ],
     # package_dir={'microbiosima'},
     test_suite="microbiosima.test",
     long_description=read('../README.md'),
-#     classifiers=[
-#             ],
+    classifiers=[
+	'Intended Audience :: Science/Research'
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+	'Programming Language :: Python :: 2.7',
+	'Topic :: Scientific/Engineering :: Bio-Informatics'
+            ],
 
 )

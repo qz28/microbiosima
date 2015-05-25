@@ -27,8 +27,6 @@
         <delete dir="${build}"/>
     </target>
 
-    
-
     <!-- clean previous build, compile Java source code and make jar -->
     <target name="build" depends="clean,compile-all,dist-all"
             description="Clean and Build all and distribute jar">
