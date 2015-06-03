@@ -4,8 +4,7 @@
         $Id: build.xml $
     </description>
 
-    <property name="version" value="1.0"/
->
+    <property name="version" value="1.0"/>
     <property name="JDK_VERSION" value="1.8"/>
 
     <!-- set global properties for this build -->
@@ -86,16 +85,17 @@
     <property name="release_dir" value="release"/>
     <property name="Microbiosima_name" value="microbiosima"/>
     
-    <property name="common_dir" value="${release_dir}/common"/>
+    <property name="common_dir" value="common"/>
 	
+<!--
     <property name="Mac_dir" value="${release_dir}/Mac"/>
     <property name="Linux_dir" value="${release_dir}/Linux"/>
     <property name="Windows_dir" value="${release_dir}/Windows"/>
     <property name="Mac_package_dir" value="${Mac_dir}/${Microbiosima_name}_v${version}"/>
     <property name="Linux_package_dir" value="${Linux_dir}/${Microbiosima_name}_v${version}"/>
     <property name="Windows_package_dir" value="${Windows_dir}/${Microbiosima_name}_v${version}"/>
-
-	<property name="release_package_dir" value="${release_dir}/${Microbiosima_name}_v${version}"/>
+-->
+    <property name="release_package_dir" value="${release_dir}/${Microbiosima_name}_v${version}"/>
 
     <target name="release" depends="build"
             description="release for Microbiosima">
@@ -115,8 +115,20 @@
         <copy file="${dist}/microbiosima.jar" todir="${release_package_dir}/lib"/>
 
         <!--<copy file="${common_dir}/README.md" todir="${release_package_dir}"/>-->
+        <tar destfile="${release_dir}/${Microbiosima_name}_v${version}.tgz" compression="gzip">
+            <tarfileset dir="${release_package_dir}"> 
+                <include name="lib/**" />
+                <include name="doc/**" />
+            </tarfileset> 
+            <tarfileset dir="${release_package_dir}" filemode="775"> 
+                <include name="bin/**" />
+            </tarfileset> 
+        </tar>
 
-        <echo message="Have to tar manaully, because [ANT Bug 550] the tar task change the mode of the executables files."/>
+        <!-- <tarfileset dir="${release_package_dir}" filemode="775" prefix="${Microbiosima_name}_v${version}" > 
+            once excluded, haven't find a way in include it again
+        -->
+        <!-- <echo message="Have to tar manaully, because [ANT Bug 550] the tar task change the mode of the executables files."/> -->
         <echo message="Release build is finished."/>
     </target>
 
