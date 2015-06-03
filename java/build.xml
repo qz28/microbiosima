@@ -4,6 +4,8 @@
         $Id: build.xml $
     </description>
 
+    <property name="version" value="1.0"/
+>
     <property name="JDK_VERSION" value="1.8"/>
 
     <!-- set global properties for this build -->
@@ -81,8 +83,6 @@
         <java jar="${dist}/microbiosima.jar" fork="true"/>
     </target>
 
-    <property name="version" value="0.8"/>
-    <property name="version_number" value="0.8"/>
     <property name="release_dir" value="release"/>
     <property name="Microbiosima_name" value="microbiosima"/>
     

@@ -18,8 +18,9 @@
 ################################################################################
 
 import os
-from setuptools import setup
-
+# from setuptools import setup
+from distutils.core import setup
+from microbiosima import __version__
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
 # README file and 2) it's easier to type in the README file than to put a raw
@@ -29,7 +30,7 @@ def read(fname):
 
 setup(
     name="microbiosima",
-    version="0.8",
+    version=__version__,
     author="Qinglong Zeng, Jeet Sukumaran, Steven Wu and Allen Rodrigo",
     author_email="qinglong.zeng@duke.edu",
     description="Simulates the evolutionary and ecological dynamics of microbiomes within a population of hosts.",

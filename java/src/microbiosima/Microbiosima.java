@@ -42,7 +42,7 @@ import org.apache.commons.cli.ParseException;
  */
 public class Microbiosima {
 
-	private static final String VERSION = "0.8";
+	private static final String VERSION = "1.0";
 
 	/**
 	 * @param args

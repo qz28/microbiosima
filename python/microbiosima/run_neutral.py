@@ -23,15 +23,14 @@ import sys
 from argparser_util import CustomSingleMetavarFormatter
 from population import Population
 from species_registry import SpeciesRegistry
+from __init__ import __version__
 
-
-MICROBIOSIMA_VERSION = "0.8"
+MICROBIOSIMA_VERSION = __version__
 MICROBIOSIMA_DESCRIPTION = "Simulates the evolutionary and ecological dynamics of microbiomes within a population of hosts."
 
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         prog="microbiosima", description=MICROBIOSIMA_DESCRIPTION,
         formatter_class=CustomSingleMetavarFormatter)
