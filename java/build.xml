@@ -83,7 +83,7 @@
     </target>
 
     <property name="release_dir" value="release"/>
-    <property name="Microbiosima_name" value="microbiosima"/>
+    <property name="Microbiosima_name" value="microbiosima_Java"/>
     
     <property name="common_dir" value="common"/>
 	
