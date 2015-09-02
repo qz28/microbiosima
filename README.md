@@ -1,5 +1,9 @@
 # MICROBIOSIMA
 
+Zeng Q, Sukumaran J, Wu S, Rodrigo A (2015) Neutral Models of Microbiome Evolution. PLoS Comput Biol 11(7): e1004365. doi:10.1371/journal.pcbi.1004365
+
+http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004365
+
 Simulates the evolutionary and ecological dynamics of microbiomes within a population of hosts.
 
 There are two versions of this program
