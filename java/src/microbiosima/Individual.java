@@ -56,7 +56,7 @@ public class Individual {
         
 	public String printOut() {
 		StringBuilder sb = new StringBuilder();
-		for (int i = 1; i < numberEnvironmentalSpecies; i++) {
+		for (int i = 0; i < numberEnvironmentalSpecies; i++) {
 			sb.append(microbiome[i]).append("\t");
 		}
 		return sb.toString().trim();

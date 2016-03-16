@@ -334,7 +334,7 @@ public class Population {
 
 	public String printOut() {
 		StringBuilder sb = new StringBuilder();
-		for (int i = 1; i < numberOfEnvironmentalSpecies; i++) {
+		for (int i = 0; i < numberOfEnvironmentalSpecies; i++) {
 			sb.append(microbiomeSum[i]).append("\t");
 		}
 		return sb.toString().trim();
