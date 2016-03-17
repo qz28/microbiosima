@@ -34,6 +34,15 @@ public class MathUtil {
 	public static int getNextInt(int max){
 		return rd.nextInt(0, max);
 	}
+        public static double getNextFloat(double max){
+		return rd.nextUniform(0, 1)*max;
+	}
+        public static void setSeed(){
+            rd.reSeed();
+        }
+        public static void setSeed(long s){
+            rd.reSeed(s);
+        }
 	
 	
 }

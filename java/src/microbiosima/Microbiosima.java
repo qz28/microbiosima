@@ -213,13 +213,8 @@ public class Microbiosima {
 				while (population.getNumberOfGeneration() < numberOfGeneration) {
 					population.sumSpecies();
 					if (population.getNumberOfGeneration() % numberOfObservation == 0) {
-						// file1.print(population.gammaDiversity(false));
-						// file2.print(population.alphaDiversity(false));
-						// file1.print("\t");
-						// file2.print("\t");
 						file1.println(population.gammaDiversity(true));
 						file2.println(population.alphaDiversity(true));
-						population.microbiomeSequenceAlignment();
 						file3.print(population.betaDiversity(true));
 						file3.print("\t");
 						file3.println(population.BrayCurtis(true));

@@ -26,8 +26,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import utils.DifferentElement;
 import utils.Distance;
+import utils.DiversityIndex;
 import utils.RandomSample;
 import utils.VectorAddition;
 import utils.random.MathUtil;
@@ -38,84 +38,90 @@ import utils.random.Multinomial2;
  * @author John
  */
 public class Population {
-
-	double[] initialEnvironment;
-	double[] microbiomeSum;
-	double[][] parentalContribution;
+	
+	final int numberOfMicrobePerHost;
+	final int numberOfEnvironmentalSpecies;
+	final int numberOfIndividual;
+	final double environmentalFactor;
+	final double percentageOfpooledOrFixed;
+	
+	double coefficient;
+    double[][] parentalContribution;
 	double[] environmentalContribution;
 	double[] mixedContribution;
-	double coefficient;
+	double[] initialEnvironment;
+	double[] microbiomeSum;
+	private double[] previous_microbiomes;
+	int[] parentalIndex;
+    int[] ancestryIndex;
 	
-	private final int numberOfMicrobePerHost;
-	private final int numberOfEnvironmentalSpecies;
-	private final int numberOfIndividual;
-	private final double environmentalFactor;
-	private final double percentageOfPooledFixed;
 	
-	private int numberOfGeneration;
 	private double g_diversity;
 	private double a_diversity;
 	private double b_diversity;
-    private double weighted_b_diversity;
-	private String[] alignment;
-	
-	private int sampleReplicates;
-	private int numberOfSamples;
-	private double[] previous_microbiomes;
 	private double beta_diversity_coef;
     private double beta_diversity_coef_2;
     private double beta_diversity_coef_3;
-    private double beta_diversity_coef_4;
+    private double beta_diversity_coef_4;	
+    private double weighted_b_diversity;
 	
-    private Individual[] compositionOfIndividuals;
+	private int numberOfGeneration;
+	private int sampleReplicates;
+	private int numberOfSamples;	
+
+	private Individual[] compositionOfIndividuals;
+
 	private List<Set<Integer>> samples = new ArrayList<>();
-	private List<Integer> host_index = new ArrayList<>();
 	
-	private Multinomial2 multiNomialDist;
+	List<Integer> host_index = new ArrayList<>();
+	
+	Multinomial2 multiNomialDist;
 	
 	public Population(int numberOfMicrobePerHost, double[] environment, int noOfIndividual, 
-			double environmentalFactor, double percentageOfPooledFixed, 
-			int numberOfSamples, int sampleReplicates0) throws IOException {
+			double environmentalFactor,
+			double pooledOrFiexd, int numberOfSamples, int sampleReplicates0) throws IOException {
 		this.numberOfMicrobePerHost = numberOfMicrobePerHost;
 		this.numberOfEnvironmentalSpecies = environment.length;
 		this.numberOfIndividual = noOfIndividual;
 		this.environmentalFactor = environmentalFactor;
-		this.percentageOfPooledFixed = percentageOfPooledFixed;
+		this.percentageOfpooledOrFixed = pooledOrFiexd;//NOTE: "or" sounds like a boolean variable
 		
 		this.numberOfGeneration = 0;
 		this.sampleReplicates = sampleReplicates0;				
 		this.numberOfSamples = numberOfSamples;
-		coefficient = (1 - environmentalFactor) / this.numberOfMicrobePerHost;
+		coefficient = (1 - environmentalFactor) / this.numberOfMicrobePerHost; //NOTE: change to this.
 		initialEnvironment = environment;
 		
 		compositionOfIndividuals = new Individual[numberOfIndividual];
-		parentalContribution = new double[noOfIndividual][numberOfEnvironmentalSpecies];
+		parentalContribution = new double[noOfIndividual][numberOfEnvironmentalSpecies];//NOTE: change to numberOfIndividual
 		microbiomeSum = new double[numberOfEnvironmentalSpecies];
 		environmentalContribution = new double[numberOfEnvironmentalSpecies];
 		mixedContribution = new double[numberOfEnvironmentalSpecies];
 		previous_microbiomes = new double[numberOfEnvironmentalSpecies];
+                parentalIndex=new int[numberOfIndividual];
+                ancestryIndex=new int[numberOfIndividual];
 		
 		multiNomialDist = new Multinomial2(numberOfEnvironmentalSpecies);
 		
-		alignment = new String[numberOfIndividual];
-		
-		beta_diversity_coef = 2.0 / numberOfIndividual
-				/ (numberOfIndividual - 1) / numberOfEnvironmentalSpecies;
-		beta_diversity_coef_2 = 1.0 / numberOfIndividual
-				/ (numberOfIndividual - 1) / numberOfMicrobePerHost;
-		beta_diversity_coef_3 = 1.0 / numberOfSamples / (numberOfSamples - 1)
-				/ numberOfMicrobePerHost / sampleReplicates;
-		beta_diversity_coef_4 = 2.0 / numberOfSamples / (numberOfSamples - 1)
-				/ numberOfEnvironmentalSpecies / sampleReplicates;
-		
+		beta_diversity_coef = 2.0  / numberOfIndividual
+				/ (numberOfIndividual - 1)/numberOfMicrobePerHost;
+        beta_diversity_coef_2 = 2.0  / numberOfIndividual
+				/ (numberOfIndividual - 1);
+        beta_diversity_coef_3 = 2.0  / numberOfSamples
+				/ (numberOfSamples - 1)
+				/ sampleReplicates;
+        beta_diversity_coef_4 = 2.0  / numberOfSamples
+				/ (numberOfSamples - 1)
+				/ sampleReplicates/numberOfMicrobePerHost;
 		for (int i = 0; i < numberOfIndividual; i++) {
 			host_index.add(i);
+                        ancestryIndex[i]=i;
 		}
 		for (int i = 0; i < sampleReplicates; i++) {
 			samples.add(RandomSample.randomSample(host_index,
 					this.numberOfSamples));
 		}
-        multiNomialDist.updateProb(initialEnvironment);
+                multiNomialDist.updateProb(initialEnvironment);
 		for (int i = 0; i < noOfIndividual; i++) {
 			compositionOfIndividuals[i] = new Individual(
 					multiNomialDist, this.numberOfMicrobePerHost,
@@ -135,15 +141,6 @@ public class Population {
 		}
 	}
 
-	public void microbiomeSequenceAlignment() {
-		
-		int i = 0;
-		for (Individual host : getIndividuals()) {
-			alignment[i] = host.microbial_sequences();
-			i++;
-		}
-	}
-
 	public double interGenerationDistance() {
 		if (getNumberOfGeneration() == 0)
 			return 0;
@@ -154,7 +151,7 @@ public class Population {
 
 	public double environmentPopulationDistance() {
 		if (getNumberOfGeneration() == 0)
-
+			//TODO: can we merge these two??
 			return Distance.getDistance(initialEnvironment, microbiomeSum);
 		else
 			return Distance.getDistance(environmentalContribution,
@@ -165,13 +162,19 @@ public class Population {
 
 	public void parentalInheritanceAndEnvironmentalAcquisition() {
 		
+        int[] oldAncestryIndex= new int[numberOfIndividual];
+        System.arraycopy(ancestryIndex,0,oldAncestryIndex, 0,numberOfIndividual);
 		for (int i = 0; i < numberOfIndividual; i++) {
-			System.arraycopy(compositionOfIndividuals[MathUtil.getNextInt(numberOfIndividual-1)].getMicrobiome(),
+            parentalIndex[i]=MathUtil.getNextInt(numberOfIndividual-1);
+            ancestryIndex[i]=oldAncestryIndex[parentalIndex[i]];
+			System.arraycopy(compositionOfIndividuals[parentalIndex[i]].getMicrobiome(),
                                 0,parentalContribution[i], 0,numberOfEnvironmentalSpecies);
 		}
+		//NOTE: Maybe we can merge some of these environmentalContribution, mixedContribution, parentalContribution
+		//These fields are not used at other places
 		
 		VectorAddition.additionOfVectors(environmentalContribution,
-				percentageOfPooledFixed, 1 - percentageOfPooledFixed, microbiomeSum,
+				percentageOfpooledOrFixed, 1 - percentageOfpooledOrFixed, microbiomeSum,
 				initialEnvironment);
 
 		for (int i = 0; i < numberOfIndividual; i++) {
@@ -192,35 +195,46 @@ public class Population {
 			samples.set(i,
 					RandomSample.randomSample(host_index, numberOfSamples));
 		}
+		
 		System.arraycopy(microbiomeSum, 0, previous_microbiomes, 0, microbiomeSum.length);
+
 		numberOfGeneration++;
 	}
+        
+    public double[][] sample(int i){
+            Set<Integer> sampleId=samples.get(i);
+            double[][] sampleMicrobiomes=new double[numberOfSamples][];
+            int m=0;
+            for (Integer index:sampleId){
+                 sampleMicrobiomes[m]=getIndividuals()[index].getMicrobiome();
+                 m++;
+            }
+            return sampleMicrobiomes;
+    }
+        
+    public double[] pooledSample(int i){
+            Set<Integer> sampleId=samples.get(i);
+            double[] temp_sum = new double[numberOfEnvironmentalSpecies];
+            for (Integer index : sampleId) {
+		VectorAddition.additionOfVectors(temp_sum, 1, 1.0/numberOfSamples,
+							temp_sum,
+							getIndividuals()[index].getMicrobiome());
+				}
+            return temp_sum;
+    }
 
 	public double alphaDiversity(boolean sampleOrNot) {
+                a_diversity = 0;
 		if (sampleOrNot) {
-			a_diversity = 0;
 			for (Individual host : getIndividuals()) {
-				for (double abundance : host.getMicrobiome()) {
-					if (abundance > 0 && abundance < numberOfMicrobePerHost) {
-						a_diversity -= getPlogP(abundance, numberOfMicrobePerHost);
-//						double relative_abundance = abundance
-//								/ numberOfMicrobePerHost;
-//								relative_abundance
-//								* Math.log(relative_abundance);
-					}
-				}
+				a_diversity+=DiversityIndex.shannonWienerIndex(host.getMicrobiome(),numberOfMicrobePerHost);
 			}
 			a_diversity /=  numberOfIndividual;
-		} else {
- 			a_diversity = 0;
+		}
+                else {
 			for (Set<Integer> sample : samples) {
 				for (Integer index : sample) {
-					for (double abundance : getIndividuals()[index].getMicrobiome()) {
-						if (abundance > 0
-								&& abundance < numberOfMicrobePerHost) {
-							a_diversity -= getPlogP(abundance, numberOfMicrobePerHost);
-						}
-					}
+					a_diversity+=DiversityIndex.shannonWienerIndex(getIndividuals()[index].getMicrobiome(),numberOfMicrobePerHost);
 				}
 			}
 			a_diversity /= (numberOfSamples * sampleReplicates);
@@ -231,110 +245,73 @@ public class Population {
 
 	
 	public double betaDiversity(boolean sampleOrNot) {
+                b_diversity=0;
 		if (sampleOrNot) {
-			b_diversity = 0;
+                        if (numberOfIndividual>1){
 			for (int i = 1; i < numberOfIndividual; i++) {
 				for (int j = 0; j < i; j++) {
-					b_diversity += DifferentElement.differentElement(
-							alignment[i], alignment[j]);
+					b_diversity+=DiversityIndex.PiIndex(getIndividuals()[i].getMicrobiome(), getIndividuals()[j].getMicrobiome());
 				}
 			}
 			
-			b_diversity *= beta_diversity_coef;
-			return b_diversity;
-		} 
+			b_diversity *= beta_diversity_coef_2;
+		} }
                 else {
-			double temp_b = 0;
-			for (Set<Integer> sample : samples) {
-				String[] temp_alignment = new String[numberOfSamples];
-				int m = 0;
-				for (Integer index : sample) {
-					temp_alignment[m] = alignment[index];
-					m++;
-				}
-				for (int i = 1; i < numberOfSamples; i++) {
-					for (int j = 0; j < i; j++) {
-						temp_b += DifferentElement.differentElement(
-								temp_alignment[i], temp_alignment[j]);
-					}
-				}
-			}
-			b_diversity = beta_diversity_coef_4 *  temp_b;
-			return b_diversity;
-		}
+                        if (numberOfSamples>1){
+                        for (int index=0;index<sampleReplicates;index++){
+                            double[][] temp_microbiomes=sample(index);
+                            for (int i = 1; i < numberOfSamples; i++) {
+                                for (int j = 0; j < i; j++) {
+                                    b_diversity += DiversityIndex.PiIndex(temp_microbiomes[i], temp_microbiomes[j]);
+                                }
+                            }
+                        }
+			b_diversity *= beta_diversity_coef_3; 
+		}}
+                return b_diversity;
 	}
 
 	public double gammaDiversity(boolean sampleOrNot) {
+                g_diversity=0;
 		if (sampleOrNot) {
-			g_diversity = 0;
-			for (double abundance : microbiomeSum) {
-				if (abundance > 0 && abundance < 1) {
-					g_diversity -= getPlogP(abundance);
-				}
-			}
-			return g_diversity;
+			g_diversity = DiversityIndex.shannonWienerIndex(microbiomeSum);
 		} else {
-			double temp_g = 0;
-			double[] temp_sum = new double[numberOfEnvironmentalSpecies];
-			for (Set<Integer> sample : samples) {
-				Arrays.fill(temp_sum, 0);
-				for (Integer index : sample) {
-					VectorAddition.additionOfVectors(temp_sum, 1, 1,
-							temp_sum,
-							getIndividuals()[index].getMicrobiome());
-				}
-				for (double abundance : temp_sum) {
-					double r_abundance = abundance / numberOfMicrobePerHost
-							/ numberOfSamples;
-					if (r_abundance > 0 && r_abundance < 1) {
-						temp_g -= getPlogP(r_abundance);
-					}
-				}
-			}
-			g_diversity = temp_g / sampleReplicates;
-			return g_diversity;
+                        for(int index=0;index<sampleReplicates;index++){
+                            double[] temp_sum=pooledSample(index);
+                            g_diversity+=DiversityIndex.shannonWienerIndex(temp_sum);
+                        }
+			g_diversity = g_diversity / sampleReplicates;	
 		}
+                return g_diversity;
 	}
         
-        public double BrayCurtis(boolean sampleOrNot){
+    public double BrayCurtis(boolean sampleOrNot){
+            weighted_b_diversity=0;
             if (sampleOrNot){
-                weighted_b_diversity=0;
                 for (int i=1;i<numberOfIndividual;i++){
                     for (int j=0;j<i;j++){
-                        for (int k=0;k<numberOfEnvironmentalSpecies;k++){
-                            weighted_b_diversity+=
-                                    Math.abs(getIndividuals()[i].getMicrobiome()[k]-getIndividuals()[j].getMicrobiome()[k]);
-                        }
+                        weighted_b_diversity+= DiversityIndex.BrayCurtis(getIndividuals()[i].getMicrobiome(), getIndividuals()[j].getMicrobiome());
                     }
                 }
-                weighted_b_diversity*=beta_diversity_coef_2;
-                return weighted_b_diversity;
+                weighted_b_diversity*=beta_diversity_coef;
             }
             else{
-                weighted_b_diversity=0;
-                for (Set<Integer> sample : samples) {
-                    double[][] temp_microbiomes=new double[numberOfSamples][];
-                    int m=0;
-                    for (Integer index:sample){
-                        temp_microbiomes[m]=getIndividuals()[index].getMicrobiome();
-                        m++;
-                    }
-                    for (int i=1;i<numberOfSamples;i++){
-                        for(int j=0;j<i;j++){
-                            for (int k=0;k<numberOfEnvironmentalSpecies;k++){
-                                weighted_b_diversity+=Math.abs(temp_microbiomes[i][k]-temp_microbiomes[j][k]);
+                for (int index=0;index<sampleReplicates;index++){
+                            double[][] temp_microbiomes=sample(index);
+                            for (int i = 1; i < numberOfSamples; i++) {
+                                for (int j = 0; j < i; j++) {
+                                    weighted_b_diversity += DiversityIndex.BrayCurtis(temp_microbiomes[i], temp_microbiomes[j]);
+                                }
                             }
                         }
-                    }
-                }
-                weighted_b_diversity*=beta_diversity_coef_3;
-                return weighted_b_diversity;
+			weighted_b_diversity *= beta_diversity_coef_4;
             }
-        }
+            return weighted_b_diversity;
+    }
 
 	public String printOut() {
 		StringBuilder sb = new StringBuilder();
-		for (int i = 1; i < numberOfEnvironmentalSpecies; i++) {
+		for (int i = 0; i < numberOfEnvironmentalSpecies; i++) {
 			sb.append(microbiomeSum[i]).append("\t");
 		}
 		return sb.toString().trim();
@@ -352,16 +329,23 @@ public class Population {
 		numberOfGeneration = 0;
 		
 	}
+	
+    public boolean checkAncestry() {
+        for (int i=1; i<numberOfIndividual;i++){
+            if (ancestryIndex[i-1]!=ancestryIndex[i])
+                return false;
+            }
+            return true;
+        }
+        
+    public String indexPrintOut(int[] indexArray) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < indexArray.length; i++) {
+			sb.append(indexArray[i]).append("\t");
+		}
+		return sb.toString().trim();
+	}	
 
-	private static double getPlogP(double abundance) {
-		return getPlogP(abundance, 1);
-	}
-
-	private static double getPlogP(double abundance, int normaliser) {
-		double relative_abundance = abundance / normaliser;
-		double pLogP = relative_abundance * Math.log(relative_abundance);
-		return pLogP;
-	}
         
      
 

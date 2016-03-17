@@ -17,31 +17,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package microbiosima;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  * @author John
  */
 public class CustomFileReader {
 	private String[] commands;
+        public int numberOfLines;
 
 	public CustomFileReader(String file_path, int number_of_line) throws IOException {
 		BufferedReader bf = new BufferedReader(new FileReader(file_path));
-		String aLine;
 		commands = new String[number_of_line];
+                numberOfLines=number_of_line;
 		int i = 0;
-		//FIXME: What happen if number_of_line < actual numbers of lines in the file?
-		while ((aLine = bf.readLine()) != null) {
-			commands[i] = aLine;
+		while (i<number_of_line) {
+			commands[i] = bf.readLine();
 			i++;
 		}
 		bf.close();
 	}
-
+        
+        public CustomFileReader(String file_path) throws IOException {
+		BufferedReader bf = new BufferedReader(new FileReader(file_path));
+		String aLine;
+                List<String> commandList=new ArrayList<>();
+		int i = 0;
+		while ((aLine = bf.readLine()) != null) {
+			commandList.add(aLine);
+			i++;
+		}
+                commands = new String[i];
+                commandList.toArray(commands);
+                numberOfLines=i;
+		bf.close();
+	}
+        
 	/**
 	 * @return the commands
 	 */
@@ -49,9 +72,18 @@ public class CustomFileReader {
 		return commands[index];
 	}
 	
-	public String[] getCommandSpilt(int index){
+	public String[] getCommandSplit(int index){
 		return commands[index].split("\t");
 	}
+        
+        public double[] getNumericArray(int index){
+            String[] stringArray=getCommandSplit(index);
+            double[] numericArray=new double[stringArray.length];
+            for (int i=0;i<stringArray.length;i++){
+                numericArray[i]=Double.parseDouble(stringArray[i]);
+            }
+            return numericArray;
+        }
 	
 	
 
