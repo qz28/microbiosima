@@ -37,19 +37,19 @@ public class SelectiveMicrobiosima extends Microbiosima {
 	 */
 	 
      public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
-        int populationSize=500;//Integer.parseInt(parameters[1]);
-        int microSize=1000;//Integer.parseInt(parameters[2]);
+        int populationSize=5000;//Integer.parseInt(parameters[1]);
+        int microSize=1000000000;//Integer.parseInt(parameters[2]);
         int numberOfSpecies=150;//Integer.parseInt(parameters[3]);
-        int numberOfGeneration=10000;
-        int Ngene=10;
-		int numberOfObservation=100;
-		int numberOfReplication=10;
+        int numberOfGeneration=200000;
+        int Ngene=25;
+		int numberOfObservation=5000;
+		int numberOfReplication=5;
         double Ngenepm=5;
 		double pctEnv = 0;
 		double pctPool = 0;
 		double msCoeff=1;
 		double hsCoeff=1;
-                boolean HMS_or_TMS=true;
+        boolean HMS_or_TMS=true;
                 
 		
 
