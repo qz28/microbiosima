@@ -1,8 +1,17 @@
 # MICROBIOSIMA
+Noted on 2024/03/21: We recently fixed a small bug affecting our simulation models of microbiome evolution incorporating host and microbial selection. But all the patterns we have published still holds after the bug fix.
 
 Zeng Q, Sukumaran J, Wu S, Rodrigo A (2015) Neutral Models of Microbiome Evolution. PLoS Comput Biol 11(7): e1004365. doi:10.1371/journal.pcbi.1004365
 
 http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004365
+
+Zeng, Q., Wu, S., Sukumaran, J., & Rodrigo, A. (2017). Models of microbiome evolution incorporating host and microbial selection. Microbiome, 5, 1-16.
+
+https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-017-0343-x
+
+Zeng, Q., & Rodrigo, A. (2018). Neutral models of short-term microbiome dynamics with host subpopulation structure and migration limitation. Microbiome, 6, 1-13.
+
+https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-018-0464-x
 
 Simulates the evolutionary and ecological dynamics of microbiomes within a population of hosts.
 

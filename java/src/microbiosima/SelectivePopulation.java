@@ -89,10 +89,10 @@ public class SelectivePopulation extends Population{
 			multiNomialDist.multisample(
 					getIndividuals()[i].microbiome,
 					numberOfMicrobePerHost);
-                        getIndividuals()[i].microbeFitnessRecords=parentalMicrobeFitness[i];
-                        getIndividuals()[i].hostFitnessRecords=parentalHostFitness[i];
-                        getIndividuals()[i].microbeGenesFitness=parentalMGeneFitness[i];
-                        getIndividuals()[i].hostGenesFitness=parentalHGeneFitness[i];
+                        System.arraycopy(parentalMicrobeFitness[i], 0, getIndividuals()[i].microbeFitnessRecords, 0, numberOfEnvironmentalSpecies);
+                        System.arraycopy(parentalHostFitness[i], 0, getIndividuals()[i].hostFitnessRecords, 0, numberOfEnvironmentalSpecies);
+                        System.arraycopy(parentalMGeneFitness[i], 0, getIndividuals()[i].microbeGenesFitness, 0, getSpeciesRegistry().numOfTolGenes);
+                        System.arraycopy(parentalHGeneFitness[i], 0, getIndividuals()[i].hostGenesFitness, 0, getSpeciesRegistry().numOfTolGenes);
                         fitnessList[i]=getSpeciesRegistry().getTotalFitness(getIndividuals()[i].getMicrobiome(), getIndividuals()[i].hostFitnessRecords);
         }
     }

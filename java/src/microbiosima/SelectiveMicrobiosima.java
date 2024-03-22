@@ -217,16 +217,16 @@ public class SelectiveMicrobiosima extends Microbiosima {
         PrintWriter file10= new PrintWriter(new BufferedWriter(new FileWriter(prefix+"microbiome_fitness_distribution"+sufix)));
         PrintWriter file11= new PrintWriter(new BufferedWriter(new FileWriter(prefix+"bacteria_contents"+sufix)));
         PrintWriter file12= new PrintWriter(new BufferedWriter(new FileWriter(prefix+"individual_bacteria_contents"+sufix)));
-        for (int i=0;i<Ngene;i++){
+	MathUtil.setSeed(rep%numberOfReplication);
+	for (int i=0;i<Ngene;i++){
           fitnessToMicrobe[i]=MathUtil.getNextInt(2)-1;
           fitnessToHost[i]=MathUtil.getNextInt(2)-1;
         }
-	MathUtil.setSeed(rep%numberOfReplication);
         SelectiveSpeciesRegistry ssr=new SelectiveSpeciesRegistry(numberOfSpecies,Ngene, Ngenepm, msCoeff,fitnessToHost,fitnessToMicrobe);
         MathUtil.setSeed();
         SelectivePopulation population=new SelectivePopulation(microSize, environment, populationSize, pctEnv , pctPool,0,0,ssr,hsCoeff,HMS_or_TMS);
         
-        while (population.getNumberOfGeneration()<numberOfGeneration){
+        while (population.getNumberOfGeneration()<=numberOfGeneration){
             population.sumSpecies();
             if(population.getNumberOfGeneration()%numberOfObservation==0){
                 //file1.print(population.gammaDiversity(false));
