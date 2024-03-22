@@ -210,7 +210,7 @@ public class Microbiosima {
 				Population population = new Population(microSize, environment,
 						populationSize, pctEnv, pctPool, 0, 0);
 
-				while (population.getNumberOfGeneration() < numberOfGeneration) {
+				while (population.getNumberOfGeneration() <= numberOfGeneration) {
 					population.sumSpecies();
 					if (population.getNumberOfGeneration() % numberOfObservation == 0) {
 						file1.println(population.gammaDiversity(true));
